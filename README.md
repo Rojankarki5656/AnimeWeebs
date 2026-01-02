@@ -5,7 +5,7 @@
 3. Video Stream
 
 
-For homepage, json will look like this:
+For homepage Muji, json will look like this:
 
 {
     "success": true,
