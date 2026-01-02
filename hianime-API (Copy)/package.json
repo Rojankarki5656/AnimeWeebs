@@ -1,0 +1,45 @@
+{
+  "name": "hianime-api",
+  "module": "index.js",
+  "type": "module",
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5.8.3"
+  },
+  "lint-staged": {
+    "*.{js,ts}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "scripts": {
+    "prepare": "husky",
+    "lint": "eslint",
+    "lint:fix": "eslint --fix && prettier . --write",
+    "dev": "bun --hot index.js",
+    "start": "bun index.js",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@hono/zod-openapi": "^1.2.0",
+    "@scalar/hono-api-reference": "^0.9.30",
+    "@upstash/redis": "^1.35.8",
+    "cheerio": "^1.1.2",
+    "crypto-js": "^4.2.0",
+    "hono": "^4.11.1",
+    "hono-rate-limiter": "^0.4.2",
+    "zod": "^4.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.2",
+    "@types/bun": "latest",
+    "eslint": "^9.39.2",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-prettier": "^5.5.4",
+    "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.7",
+    "prettier": "^3.7.4"
+  }
+}
