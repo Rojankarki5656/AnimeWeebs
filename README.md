@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # AnimeWeebs
 
 1. HomePage
@@ -5,7 +6,7 @@
 3. Video Stream
 
 
-this is the updated from keshav branch
+
 
 
 For homepage Muji, json will look like this:
@@ -1286,3 +1287,4 @@ For homepage Muji, json will look like this:
         ]
     }
 }
+>>>>>>> a34f4740c5542ff891cdfccbd646a7558a029d75

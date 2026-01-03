@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AnimeFlix - Watch Anime Online</title>
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- CSS Files -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/responsive.css">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <!-- Header Section -->
+    <header>
+        <div class="container header-container">
+            <!-- Logo -->
+            <div class="logo">
+                <i class="fas fa-play-circle"></i>
+                <span>AnimeFlix</span>
+            </div>
+            
+            <!-- Navigation -->
+            <nav class="main-nav">
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link active">Home</a></li>
+                    <li><a href="#popular" class="nav-link">Popular</a></li>
+                    <li><a href="#movies" class="nav-link">Movies</a></li>
+                    <li><a href="#series" class="nav-link">TV Series</a></li>
+                    <li><a href="#genres" class="nav-link">Genres</a></li>
+                    <li><a href="#new" class="nav-link">New Releases</a></li>
+                </ul>
+            </nav>
+            
+            <!-- Header Actions (Search, User Actions) -->
+            <div class="header-actions">
+                <!-- Search Box -->
+                <div class="search-container">
+                    <button class="search-btn" id="searchBtn">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search anime...">
+                </div>
+                
+                <!-- User Actions -->
+                <div class="user-actions">
+                    <button class="btn btn-secondary" id="signInBtn">Sign In</button>
+                    <button class="btn btn-primary" id="signUpBtn">Sign Up</button>
+                </div>
+                
+                <!-- Mobile Menu Button -->
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="hero-background"></div>
+            <div class="hero-content container">
+                <span class="hero-badge">TRENDING NOW</span>
+                <h1 class="hero-title">Demon Slayer: Kimetsu no Yaiba</h1>
+                <p class="hero-description">
+                    A family is attacked by demons and only two members survive - Tanjiro and his sister Nezuko, 
+                    who is turning into a demon slowly. Tanjiro sets out to become a demon slayer to avenge his 
+                    family and cure his sister.
+                </p>
+                
+                <!-- Hero Meta Information -->
+                <div class="hero-meta">
+                    <span><i class="fas fa-tv"></i> TV Series</span>
+                    <span><i class="fas fa-star"></i> 8.7/10</span>
+                    <span><i class="fas fa-calendar-alt"></i> 2019</span>
+                    <span><i class="fas fa-globe"></i> Sub | Dub</span>
+                </div>
+                
+                <!-- Hero Action Buttons -->
+                <div class="hero-actions">
+                    <button class="btn btn-primary btn-hero btn-play" id="heroWatchBtn">
+                        <i class="fas fa-play"></i> Watch Now
+                    </button>
+                    <button class="btn btn-secondary btn-hero" id="heroAddToListBtn">
+                        <i class="fas fa-plus"></i> Add to List
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Continue Watching Section -->
+        <section class="section continue-watching" id="continueWatching">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Continue Watching</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Continue Watching Slider -->
+                <div class="continue-slider" id="continueSlider">
+                    <!-- Cards will be dynamically loaded by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Anime Section -->
+        <section class="section featured-section" id="featured">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Featured Anime</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Featured Container with Main and Side Content -->
+                <div class="featured-container">
+                    <!-- Main Featured Anime -->
+                    <div class="featured-main">
+                        <div class="anime-card featured-card">
+                            <div class="anime-poster">
+                                <img src="https://images.unsplash.com/photo-1618331833071-1c0c6ee3d19e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1772&q=80" 
+                                     alt="Attack on Titan" 
+                                     loading="lazy">
+                                <div class="anime-rating">
+                                    <i class="fas fa-star"></i> 9.0
+                                </div>
+                            </div>
+                            <div class="anime-info">
+                                <h3 class="anime-title">Attack on Titan: The Final Season</h3>
+                                <div class="anime-meta">
+                                    <span>TV Series</span>
+                                    <span class="anime-episodes">
+                                        <i class="fas fa-film"></i> 28 Episodes
+                                    </span>
+                                </div>
+                                <p class="anime-description">
+                                    As the war for Paradis intensifies, the Scouts face their most dangerous mission 
+                                    yet as they unravel the mysteries of the Titans and the world beyond the walls.
+                                </p>
+                                <div class="anime-tags">
+                                    <span class="tag">Action</span>
+                                    <span class="tag">Drama</span>
+                                    <span class="tag">Fantasy</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Side Featured Anime List -->
+                    <div class="featured-side" id="featuredSide">
+                        <!-- Side cards will be dynamically loaded by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Popular Anime Section -->
+        <section class="section popular-section" id="popular">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Most Popular</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Popular Anime Grid -->
+                <div class="anime-grid" id="popularGrid">
+                    <!-- Cards will be dynamically loaded by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Recently Updated Section -->
+        <section class="section recent-section" id="recent">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Recently Updated</h2>
+                    <a href="#" class="section-link">View All <i class="fas fa-arrow-right"></i></a>
+                </div>
+                
+                <!-- Recent Anime Grid -->
+                <div class="anime-grid" id="recentGrid">
+                    <!-- Cards will be dynamically loaded by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Newsletter Section -->
+        <section class="section newsletter-section">
+            <div class="container">
+                <div class="newsletter-container">
+                    <h2 class="newsletter-title">Never Miss an Update</h2>
+                    <p class="newsletter-description">
+                        Subscribe to our newsletter and get notified about new episodes, 
+                        special offers, and exclusive content.
+                    </p>
+                    <form class="newsletter-form" id="newsletterForm">
+                        <input type="email" class="newsletter-input" placeholder="Enter your email address" required>
+                        <button type="submit" class="btn btn-primary newsletter-btn">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <!-- Footer Content -->
+            <div class="footer-content" id="footerContent">
+                <!-- Footer sections will be dynamically loaded by JavaScript -->
+            </div>
+            
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <p>&copy; <span id="currentYear"></span> AnimeFlix. All rights reserved. 
+                This site does not store any files on its server. 
+                All contents are provided by non-affiliated third parties.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Files -->
+    <script src="js/data.js"></script>
+    <script src="js/components.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
