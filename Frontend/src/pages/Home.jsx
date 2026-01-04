@@ -44,7 +44,7 @@ const Home = () => {
         </title>
         <meta
           name="description"
-          content=" watanuki to is a free no ads anime site to watch free anime. Online anime streaming at watanuki with DUB, SUB in HD watanuki.shop."
+          content=" AnimeWeebs is a free site with no ads to watch anime. AnimeWeebs contains all the anime for a weebs to watch. Fucking Nerds !!!"
         />
         <meta property="og:title" content="home - watanuki" />
       </Helmet>

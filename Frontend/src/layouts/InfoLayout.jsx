@@ -7,9 +7,6 @@ import {
   FaHeart,
   FaShareAlt,
   FaDownload,
-  FaCalendarAlt,
-  FaClock,
-  FaTv,
   FaStar,
   FaChevronRight,
   FaExpandAlt,
@@ -24,353 +21,303 @@ const InfoLayout = ({ data, showBigPoster }) => {
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
 
-  // Color palette for genre tags
+  /* -------------------- helpers -------------------- */
+
   const genreColors = {
-    action: "linear-gradient(135deg, #ff6b6b, #ee5a52)",
-    adventure: "linear-gradient(135deg, #48cae4, #0096c7)",
-    fantasy: "linear-gradient(135deg, #9d4edd, #560bad)",
-    romance: "linear-gradient(135deg, #ffafcc, #ff477e)",
-    comedy: "linear-gradient(135deg, #ffd166, #efb366)",
-    drama: "linear-gradient(135deg, #caf0f8, #90e0ef)",
-    isekai: "linear-gradient(135deg, #38b000, #2d6a4f)",
-    shounen: "linear-gradient(135deg, #ff595e, #c1121f)",
-    supernatural: "linear-gradient(135deg, #7209b7, #3a0ca3)",
-    mystery: "linear-gradient(135deg, #6d6875, #4a4e69)",
-    sci_fi: "linear-gradient(135deg, #00b4d8, #0077b6)",
-    slice_of_life: "linear-gradient(135deg, #83c5be, #006d77)",
+    action: "linear-gradient(135deg,#ff6b6b,#ee5a52)",
+    adventure: "linear-gradient(135deg,#48cae4,#0096c7)",
+    fantasy: "linear-gradient(135deg,#9d4edd,#560bad)",
+    romance: "linear-gradient(135deg,#ffafcc,#ff477e)",
+    comedy: "linear-gradient(135deg,#ffd166,#efb366)",
+    drama: "linear-gradient(135deg,#caf0f8,#90e0ef)",
+    mystery: "linear-gradient(135deg,#6d6875,#4a4e69)",
+    sci_fi: "linear-gradient(135deg,#00b4d8,#0077b6)",
+    slice_of_life: "linear-gradient(135deg,#83c5be,#006d77)",
   };
 
-  const getGenreColor = (genre) => {
-    const key = genre.toLowerCase().replace(/\s+/g, "_");
-    return genreColors[key] || "linear-gradient(135deg, #adb5bd, #6c757d)";
-  };
+  const getGenreColor = (genre) =>
+    genreColors[genre.toLowerCase().replace(/\s+/g, "_")] ||
+    "linear-gradient(135deg,#adb5bd,#6c757d)";
 
-  const formatStudioPath = (studioName) => {
-    if (typeof studioName === "string") {
-      return `/producer/${studioName.toLowerCase().replace(/\s+/g, "-")}`;
+  const getStudioName = (studios) => {
+    if (!studios) return null;
+    if (typeof studios === "string") return studios;
+    if (Array.isArray(studios)) {
+      if (typeof studios[0] === "string") return studios[0];
+      if (studios[0]?.name) return studios[0].name;
     }
-    return "/producer/unknown";
+    return null;
   };
 
-  // Calculate episode availability
+  const getProducers = (producers) => {
+    if (!producers) return [];
+    if (typeof producers === "string") return [producers];
+    if (Array.isArray(producers)) {
+      return producers
+        .map((p) => (typeof p === "string" ? p : p?.name))
+        .filter(Boolean);
+    }
+    if (typeof producers === "object" && producers?.name)
+      return [producers.name];
+    return [];
+  };
+
+  // Inside your component
+  const producers = getProducers(data?.producers);
+
+  const studioName = getStudioName(data?.studios);
+
   const totalEpisodes = Math.max(
-    data.episodes?.sub || 0,
-    data.episodes?.dub || 0
+    data?.episodes?.sub || 0,
+    data?.episodes?.dub || 0
   );
-  const hasBothAudio = data.episodes?.sub > 0 && data.episodes?.dub > 0;
+
+  const hasBothAudio = data?.episodes?.sub > 0 && data?.episodes?.dub > 0;
+
+  /* -------------------- UI -------------------- */
 
   return (
-    <div className="relative w-full bg-gradient-to-b from-gray-900 to-gray-950 pt-20 pb-10 overflow-hidden">
-      {/* Animated Background Overlay */}
-      <div className="absolute inset-0 opacity-5">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg%20width%3D%2260%22%20height%3D%2260%22%20xmlns%3D%22http://www.w3.org/2000/svg%22%3E%3Cpath%20d%3D%22M30%200l15%2026H15z%22%20fill%3D%22%234f46e5%22%20opacity%3D%22.1%22/%3E%3C/svg%3E')]"></div>
-      </div>
-
-      {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-t from-gray-950 via-gray-900/70 to-transparent"></div>
-
-      {/* Content Container */}
-      <div className="relative max-w-7xl mx-auto px-4 lg:px-6 xl:px-8">
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-10">
-          {/* Poster Section - Left */}
-          <div className="lg:w-2/5 xl:w-1/3 flex flex-col items-center lg:items-start">
-            {/* Poster with Hover Effects */}
-            <div className="group relative w-full max-w-sm">
+    <section className="relative pt-20 pb-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col lg:flex-row gap-12">
+          {/* LEFT */}
+          <div className="lg:w-1/3 flex flex-col items-center lg:items-start">
+            <div className="relative w-full max-w-[320px]">
               <div
-                className="relative rounded-2xl overflow-hidden shadow-2xl cursor-pointer transform transition-all duration-300 group-hover:scale-[1.02] group-hover:shadow-3xl"
-                onClick={() => showBigPoster(data.poster)}
+                onClick={() => showBigPoster(data?.poster)}
+                className="relative rounded-xl overflow-hidden shadow-xl cursor-pointer hover:scale-[1.02] transition"
               >
-                {/* Poster Image */}
                 <img
-                  src={data.poster}
-                  alt={data.title}
+                  src={data?.poster}
+                  alt={data?.title}
                   className="w-full aspect-[2/3] object-cover"
-                  loading="eager"
                 />
 
-                {/* Hover Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-gray-900/90 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <div className="absolute bottom-4 left-4 flex items-center gap-2 text-white">
-                    <FaExpandAlt className="text-lg" />
-                    <span className="text-sm font-semibold">
-                      Click to Expand
-                    </span>
+                <div className="absolute inset-0 opacity-0 hover:opacity-100 bg-black/60 transition">
+                  <div className="absolute bottom-3 left-3 flex items-center gap-2 text-sm text-white">
+                    <FaExpandAlt />
+                    Expand
                   </div>
                 </div>
 
-                {/* Quality Badge */}
-                {data.quality && (
-                  <div className="absolute top-4 right-4 bg-gray-900/90 backdrop-blur-sm px-3 py-1 rounded-full border border-gray-700">
-                    <span className="text-sm font-bold text-emerald-400 flex items-center gap-1">
-                      <MdHighQuality className="text-xs" />
-                      {data.quality}
-                    </span>
-                  </div>
+                {data?.quality && (
+                  <span className="absolute top-3 right-3 flex items-center gap-1 text-xs font-semibold bg-black/70 px-2 py-1 rounded-full text-emerald-400">
+                    <MdHighQuality />
+                    {data.quality}
+                  </span>
                 )}
               </div>
 
-              {/* Quick Stats */}
-              <div className="mt-6 grid grid-cols-3 gap-3">
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-700">
-                  <div className="text-2xl font-bold text-white">
-                    {totalEpisodes}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">EPISODES</div>
-                </div>
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-700">
-                  <div className="text-2xl font-bold text-white flex items-center justify-center gap-1">
-                    <FaStar className="text-yellow-400" />
-                    {data.MAL_score || "N/A"}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">SCORE</div>
-                </div>
-                <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-4 text-center border border-gray-700">
-                  <div className="text-2xl font-bold text-white">
-                    {data.duration}
-                  </div>
-                  <div className="text-xs text-gray-400 mt-1">DURATION</div>
-                </div>
+              {/* Stats */}
+              <div className="mt-4 grid grid-cols-4 gap-2">
+                <Stat label="EP" value={totalEpisodes} />
+                <Stat
+                  label="SCORE"
+                  value={data?.MAL_score || "N/A"}
+                  icon={<FaStar className="text-yellow-400" />}
+                />
+                <Stat label="MIN" value={data?.duration} />
+
+                {data?.is18Plus && (
+                  <Stat
+                    label="Age Rating"
+                    value="18+"
+                    className="text-red-400 font-bold"
+                  />
+                )}
               </div>
             </div>
           </div>
 
-          {/* Info Section - Right */}
-          <div className="lg:w-3/5 xl:w-2/3 text-white">
+          {/* RIGHT */}
+          <div className="lg:w-2/3 text-white">
             {/* Breadcrumb */}
-            <nav className="hidden md:flex items-center gap-2 text-sm text-gray-400 mb-6">
-              <Link to="/" className="hover:text-white transition-colors">
+            <nav className="hidden md:flex items-center gap-2 text-xs text-gray-400 mb-5">
+              <Link to="/" className="hover:text-white">
                 Home
               </Link>
-              <FaChevronRight className="text-xs" />
-              <Link
-                to={`/category/${data.type?.toLowerCase()}`}
-                className="hover:text-white transition-colors capitalize"
-              >
-                {data.type}
-              </Link>
-              <FaChevronRight className="text-xs" />
-              <span className="text-white font-medium truncate">
-                {data.title}
-              </span>
+              <FaChevronRight />
+              <span className="capitalize">{data?.type}</span>
+              <FaChevronRight />
+              <span className="text-white truncate">{data?.title}</span>
             </nav>
 
-            {/* Title Section */}
-            <div className="mb-4">
-              <h1 className="text-4xl lg:text-5xl xl:text-6xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                {data.title}
-              </h1>
-              <div className="text-xl lg:text-2xl text-gray-400 mt-2">
-                {data.alternativeTitle}
-              </div>
-              {data.japanese && (
-                <div className="text-lg text-gray-500 mt-1 font-japanese">
-                  {data.japanese}
-                </div>
-              )}
-            </div>
+            {/* Title */}
+            <h1 className="text-3xl md:text-4xl xl:text-5xl font-bold leading-tight">
+              {data?.title}
+            </h1>
 
-            {/* Status Badges */}
-            <div className="flex flex-wrap items-center gap-3 mb-6">
+            {data?.alternativeTitle && (
+              <p className="text-base text-gray-400 mt-1">
+                {data.alternativeTitle}
+              </p>
+            )}
+
+            {data?.japanese && (
+              <p className="text-sm text-gray-500 mt-1 font-japanese">
+                {data.japanese}
+              </p>
+            )}
+
+            {/* Badges */}
+            <div className="flex flex-wrap gap-2 mt-5">
+              <span className="px-3 py-1 text-xs rounded-full bg-gray-800 border border-gray-700">
+                {data?.type}
+              </span>
+
               <span
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold ${
-                  data.status === "Ongoing"
-                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
-                    : "bg-blue-500/20 text-blue-400 border border-blue-500/30"
+                className={`px-3 py-1 text-xs rounded-full border ${
+                  data?.status === "Ongoing"
+                    ? "bg-emerald-500/20 border-emerald-500 text-emerald-400"
+                    : "bg-blue-500/20 border-blue-500 text-blue-400"
                 }`}
               >
-                {data.status}
+                {data?.status}
               </span>
-              <span className="px-4 py-1.5 rounded-full text-sm font-semibold bg-gray-800 text-gray-300 border border-gray-700">
-                {data.type}
-              </span>
+
               {hasBothAudio && (
-                <span className="px-4 py-1.5 rounded-full text-sm font-semibold bg-purple-500/20 text-purple-400 border border-purple-500/30 flex items-center gap-1">
-                  <TbLanguage className="text-sm" />
+                <span className="px-3 py-1 text-xs rounded-full bg-purple-500/20 border border-purple-500 text-purple-400 flex items-center gap-1">
+                  <TbLanguage />
                   SUB & DUB
                 </span>
               )}
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap gap-4 mb-8">
+            {/* Actions */}
+            <div className="flex flex-wrap gap-3 mt-7">
               <Link
-                to={`/watch/${data.id}`}
-                className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-xl text-white font-bold text-lg shadow-lg hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                to={`/watch/${data?.id}`}
+                className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md"
               >
-                <FaPlay className="text-xl" />
-                WATCH NOW
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                <FaPlay />
+                Watch Now
               </Link>
 
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setIsSaved(!isSaved)}
-                  className={`p-4 rounded-xl border transition-all duration-300 ${
-                    isSaved
-                      ? "bg-indigo-500/20 border-indigo-500 text-indigo-400"
-                      : "bg-gray-800/50 border-gray-700 text-gray-400 hover:bg-gray-700"
-                  }`}
-                >
-                  <FaPlus className="text-xl" />
-                </button>
-                <button
-                  onClick={() => setIsLiked(!isLiked)}
-                  className={`p-4 rounded-xl border transition-all duration-300 ${
-                    isLiked
-                      ? "bg-red-500/20 border-red-500 text-red-400"
-                      : "bg-gray-800/50 border-gray-700 text-gray-400 hover:bg-gray-700"
-                  }`}
-                >
-                  <FaHeart className="text-xl" />
-                </button>
-                <button className="p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-400 hover:bg-gray-700 transition-colors">
-                  <FaShareAlt className="text-xl" />
-                </button>
-                <button className="p-4 rounded-xl bg-gray-800/50 border border-gray-700 text-gray-400 hover:bg-gray-700 transition-colors">
-                  <FaDownload className="text-xl" />
-                </button>
-              </div>
+              {/* TODO: Rojan : Add Favorite, Bookmark and Share */}
+
+              <IconBtn
+                icon={<FaPlus />}
+                active={isSaved}
+                onClick={() => setIsSaved(!isSaved)}
+              />
+              <IconBtn
+                icon={<FaHeart />}
+                active={isLiked}
+                onClick={() => setIsLiked(!isLiked)}
+              />
+              <IconBtn icon={<FaShareAlt />} />
             </div>
 
             {/* Synopsis */}
-            <div className="mb-8">
+            <div className="mt-10">
               <div className="flex items-center gap-2 mb-3">
                 <FaInfoCircle className="text-indigo-400" />
-                <h3 className="text-xl font-bold text-white">Synopsis</h3>
+                <h3 className="font-semibold">Synopsis</h3>
               </div>
-              <div className="bg-gray-900/50 backdrop-blur-sm rounded-xl p-6 border border-gray-800">
+
+              <div className="bg-gray-900/40 border border-gray-800 rounded-lg p-5">
                 <p
-                  className={`text-gray-300 leading-relaxed ${
+                  className={`text-sm text-gray-300 leading-relaxed ${
                     !showFull && "line-clamp-4"
                   }`}
                 >
-                  {data.synopsis}
+                  {data?.synopsis}
                 </p>
-                {data.synopsis?.length > 200 && (
+
+                {data?.synopsis?.length > 200 && (
                   <button
                     onClick={() => setShowFull(!showFull)}
-                    className="mt-4 text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-2 transition-colors"
+                    className="mt-3 text-indigo-400 text-sm font-medium"
                   >
                     {showFull ? "Show Less" : "Read More"}
-                    <FaChevronRight
-                      className={`text-xs transition-transform ${
-                        showFull ? "rotate-90" : ""
-                      }`}
-                    />
                   </button>
                 )}
               </div>
             </div>
 
-            {/* Details Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-800">
-                <div className="flex items-center gap-3 text-gray-400 mb-2">
-                  <FaCalendarAlt />
-                  <span className="text-sm font-semibold">AIRED</span>
-                </div>
-                <div className="text-white font-medium">
-                  {data.aired.from} {data.aired.to && `→ ${data.aired.to}`}
-                </div>
-              </div>
-
-              <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-800">
-                <div className="flex items-center gap-3 text-gray-400 mb-2">
-                  <FaClock />
-                  <span className="text-sm font-semibold">DURATION</span>
-                </div>
-                <div className="text-white font-medium">{data.duration}</div>
-              </div>
-
-              <div className="bg-gray-900/30 backdrop-blur-sm rounded-xl p-4 border border-gray-800">
-                <div className="flex items-center gap-3 text-gray-400 mb-2">
-                  <FaTv />
-                  <span className="text-sm font-semibold">TYPE</span>
-                </div>
-                <div className="text-white font-medium">{data.type}</div>
-              </div>
-            </div>
-
             {/* Genres */}
-            <div className="mb-8">
-              <h3 className="text-xl font-bold text-white mb-4">Genres</h3>
-              <div className="flex flex-wrap gap-3">
-                {data.genres?.map((genre) => (
+            <div className="mt-10">
+              <h3 className="font-semibold mb-3">Genres</h3>
+              <div className="flex flex-wrap gap-2">
+                {data?.genres?.map((genre) => (
                   <Link
                     key={genre}
                     to={`/genre/${genre.toLowerCase()}`}
-                    className="group relative overflow-hidden rounded-full px-5 py-2.5 font-semibold text-sm transition-all duration-300 hover:scale-105 hover:shadow-lg"
+                    className="px-4 py-1.5 rounded-full text-xs font-semibold text-gray-900 shadow-sm hover:scale-105 transition"
                     style={{ background: getGenreColor(genre) }}
                   >
-                    <span className="relative z-10 text-gray-900">{genre}</span>
-                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/10 transition-colors"></div>
+                    {genre}
                   </Link>
                 ))}
               </div>
             </div>
 
-            {/* Studio & Producers */}
-            <div className="flex flex-wrap gap-6">
-              {data.studios && (
-                <div>
-                  <h4 className="text-sm text-gray-400 mb-2">STUDIO</h4>
-                  <Link
-                    to={formatStudioPath(data.studios)}
-                    className="text-white hover:text-indigo-400 transition-colors font-medium flex items-center gap-2"
-                  >
-                    {data.studios}
-                    <FaExternalLinkAlt className="text-xs" />
-                  </Link>
-                </div>
-              )}
+            {/* Studio */}
+            {studioName && (
+              <div className="mt-10">
+                <h4 className="text-xs text-gray-400 mb-1">STUDIO</h4>
+                <Link
+                  to={`/producer/${studioName
+                    .toLowerCase()
+                    .replace(/\s+/g, "-")}`}
+                  className="flex items-center gap-2 text-sm hover:text-indigo-400"
+                >
+                  {studioName}
+                  <FaExternalLinkAlt className="text-xs" />
+                </Link>
+              </div>
+            )}
 
-              {data.producers && data.producers.length > 0 && (
-                <div>
-                  <h4 className="text-sm text-gray-400 mb-2">PRODUCERS</h4>
-                  <div className="flex flex-wrap gap-3">
-                    {data.producers.map((producer, index) => (
-                      <Link
-                        key={`${producer}-${index}`}
-                        to={`/producer/${producer
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`}
-                        className="text-gray-300 hover:text-white transition-colors text-sm font-medium bg-gray-800/50 hover:bg-gray-700 px-3 py-1.5 rounded-lg"
-                      >
-                        {producer}
-                      </Link>
-                    ))}
-                  </div>
+            {/* Producers */}
+            {producers.length > 0 && (
+              <div className="mt-10">
+                <h4 className="text-xs text-gray-400 mb-1">PRODUCERS</h4>
+                <div className="flex flex-wrap gap-2">
+                  {producers.map((producer, index) => (
+                    <Link
+                      key={index}
+                      to={`/producer/${producer
+                        .toLowerCase()
+                        .replace(/\s+/g, "-")}`}
+                      className="flex items-center gap-2 text-sm hover:text-indigo-400 bg-gray-800/50 px-3 py-1.5 rounded-lg transition"
+                    >
+                      {producer}
+                      <FaExternalLinkAlt className="text-xs" />
+                    </Link>
+                  ))}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
-
-      {/* Custom Styles */}
-      <style jsx>{`
-        @import url("https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap");
-        .font-japanese {
-          font-family: "Noto Sans JP", sans-serif;
-        }
-
-        /* Glowing effect for action button */
-        .group:hover .glow-effect {
-          animation: glow 2s ease-in-out infinite alternate;
-        }
-
-        @keyframes glow {
-          from {
-            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
-          }
-          to {
-            box-shadow: 0 0 30px rgba(99, 102, 241, 0.8),
-              0 0 40px rgba(99, 102, 241, 0.4);
-          }
-        }
-      `}</style>
-    </div>
+    </section>
   );
 };
+
+/* -------------------- small components -------------------- */
+
+const Stat = ({ label, value, icon }) => (
+  <div className="bg-gray-800/40 border border-gray-700 rounded-lg px-3 py-2 text-center">
+    <div className="text-lg font-semibold text-white flex justify-center gap-1">
+      {icon}
+      {value}
+    </div>
+    <div className="text-[10px] tracking-wider text-gray-400">{label}</div>
+  </div>
+);
+
+const IconBtn = ({ icon, onClick, active }) => (
+  <button
+    onClick={onClick}
+    className={`p-3 rounded-lg border transition ${
+      active
+        ? "bg-indigo-500/20 border-indigo-500 text-indigo-400"
+        : "bg-gray-800/60 border-gray-700 text-gray-400 hover:bg-gray-700"
+    }`}
+  >
+    {icon}
+  </button>
+);
 
 export default InfoLayout;

@@ -66,8 +66,12 @@ const DetailPage = () => {
           <InfoLayout showBigPoster={showBigPoster} data={data} />
 
           <div className="row grid items-start gap-3 px-2 grid-cols-12">
-            <div className="left col-span-12 xl:col-span-9">
-              {data.moreSeasons.length !== 0 && (
+            <div
+              className={`left col-span-12 ${
+                data.related?.length > 0 ? "xl:col-span-9" : "xl:col-span-12"
+              }`}
+            >
+              {data.moreSeasons?.length > 0 && (
                 <MoreSeasons data={data.moreSeasons} />
               )}
               <VoiceActorsLayout id={id} />
@@ -78,18 +82,13 @@ const DetailPage = () => {
               )}
             </div>
 
-            <div className="right col-span-12 xl:col-span-3">
-              {data.related.length !== 0 && (
+            {data.related?.length > 0 && (
+              <div className="right col-span-12 xl:col-span-3">
                 <div className="related mt-5">
                   <Related data={data.related} />
                 </div>
-              )}
-              {data.mostPopular && (
-                <div className="most-popular col-span-12 mt-2 xl:col-span-3">
-                  <MostPopular data={data.mostPopular} />
-                </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
       ) : (
