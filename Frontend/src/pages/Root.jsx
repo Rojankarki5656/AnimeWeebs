@@ -1,6 +1,6 @@
 import { FaArrowCircleRight, FaSearch, FaFire, FaStar, FaPlayCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
-import banner from "../assets/homeBanner.png";
+import banner from "../assets/kaguya.png";
 import background from "../assets/background.jpg";
 import Navbar from "../components/Navbar";
 import { useState, useEffect } from "react";

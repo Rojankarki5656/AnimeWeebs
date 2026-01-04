@@ -1,29 +1,46 @@
-import React from "react";
 import { Link } from "react-router-dom";
 
 const MoreSeasons = ({ data }) => {
   return (
-    <div className="flex gap-5 mt-5 flex-wrap">
+    <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
       {data?.map((item) => (
         <Link
-          to={`/anime/${item.id}`}
           key={item.id}
-          className=" w-[calc(50%-1rem)] sm:w-[calc(180px-1rem)] md:w-[calc(20.66%-1rem)] h-16"
+          to={`/anime/${item.id}`}
+          className="group"
         >
           <div
-            className={` ${
-              item.isActive
-                ? "text-primary border border-primary"
-                : "text-white border-none"
-            } relative overflow-hidden px-1 rounded-md w-full h-full  flex justify-center items-center`}
+            className={`relative h-20 rounded-lg overflow-hidden border transition
+              ${
+                item.isActive
+                  ? "border-indigo-500 bg-indigo-500/10"
+                  : "border-gray-700 bg-gray-900/60 hover:bg-gray-800"
+              }
+            `}
           >
-            <h1 className="z-20 text-inherit text-center relative line-clamp-2 text-[12px] font-extrabold">
-              {item.alternativeTitle}
-            </h1>
+            {/* Background image */}
             <div
-              className="absolute opacity-[.3] blur-[2px] z-10 -inset-3 bg-cover bg-center bg-no-repeat"
+              className="absolute inset-0 bg-cover bg-center opacity-30 blur-sm scale-110"
               style={{ backgroundImage: `url(${item.poster})` }}
-            ></div>
+            />
+
+            {/* Overlay */}
+            <div className="absolute inset-0 bg-black/50" />
+
+            {/* Content */}
+            <div className="relative z-10 h-full px-3 flex items-center justify-center">
+              <p
+                className={`text-center text-xs font-semibold leading-tight line-clamp-2
+                  ${
+                    item.isActive
+                      ? "text-indigo-400"
+                      : "text-gray-200 group-hover:text-white"
+                  }
+                `}
+              >
+                {item.alternativeTitle}
+              </p>
+            </div>
           </div>
         </Link>
       ))}
