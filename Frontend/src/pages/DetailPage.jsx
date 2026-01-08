@@ -12,8 +12,13 @@ import { Helmet } from "react-helmet";
 import { useState } from "react";
 import { FaWindowClose } from "react-icons/fa";
 import VoiceActorsLayout from "../layouts/VoiceActorsLayout";
+import { useLocation } from "react-router-dom";
+
 
 const DetailPage = () => {
+  const { state } = useLocation();
+  const isUpcoming = state?.source === "top-upcoming";
+  console.log("Muji: ", state?.source);
   const { id } = useParams();
   const [bigPoster, setBigPoster] = useState(null);
 
@@ -63,7 +68,8 @@ const DetailPage = () => {
       </Helmet>
       {data && !isLoading ? (
         <div className={`DetailPage relative pt-10 ${bigPoster && "blur-sm"} `}>
-          <InfoLayout showBigPoster={showBigPoster} data={data} />
+          {console.log("Is muji: ",isUpcoming)}
+          <InfoLayout showBigPoster={showBigPoster} data={data} isUpcoming={isUpcoming}/>
 
           <div className="row grid items-start gap-3 px-2 grid-cols-12">
             <div

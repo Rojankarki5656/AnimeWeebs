@@ -16,7 +16,7 @@ import {
 import { MdHighQuality } from "react-icons/md";
 import { TbLanguage } from "react-icons/tb";
 
-const InfoLayout = ({ data, showBigPoster }) => {
+const InfoLayout = ({ data, showBigPoster, isUpcoming }) => {
   const [showFull, setShowFull] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
@@ -185,13 +185,20 @@ const InfoLayout = ({ data, showBigPoster }) => {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-3 mt-7">
-              <Link
-                to={`/watch/${data?.id}`}
-                className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md"
-              >
-                <FaPlay />
-                Watch Now
-              </Link>
+              {console.log("Is muji: ",isUpcoming)}
+              {isUpcoming ? (
+                <button className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md">
+                  ➕ Add to List
+                </button>
+              ) : (
+                <Link
+                  to={`/watch/${data?.id}`}
+                  className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md"
+                >
+                  <FaPlay />
+                  Watch Now
+                </Link>
+              )}
 
               {/* TODO: Rojan : Add Favorite, Bookmark and Share */}
 

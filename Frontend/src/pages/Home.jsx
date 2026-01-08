@@ -55,30 +55,8 @@ const Home = () => {
           <HeroCarousel slides={data?.data?.spotlight} />
           <div className="xl:mx-10">
             <TrendingLayout data={data?.data?.trending} />
-            <div className="grid mx-2 grid-cols-12 gap-4 my-5">
-              <DynamicLayout
-                title="Top Airing"
-                endpoint="top-airing"
-                data={data?.data?.topAiring}
-              />
-              <DynamicLayout
-                title="Most Popular"
-                endpoint="most-popular"
-                data={data?.data?.mostPopular}
-              />
-              <DynamicLayout
-                title="Most Favorite"
-                endpoint="most-favorite"
-                data={data?.data?.mostFavorite}
-              />
-              <DynamicLayout
-                title="Latest Completed"
-                endpoint="completed"
-                data={data?.data?.latestCompleted}
-              />
-            </div>
-            <div className="row grid my-10 gap-2 justify-center grid-cols-12 sm:mx-2">
-              <div className="left col-span-12 xl:col-span-9">
+            <div className="row grid gap-2 justify-center grid-cols-12 sm:mx-20">
+              <div className="left col-span-12 xl:col-span-0">
                 <MainLayout
                   title="Latest Episode"
                   endpoint="recently-updated"
@@ -94,10 +72,6 @@ const Home = () => {
                   endpoint="top-upcoming"
                   data={data?.data?.topUpcoming}
                 />
-              </div>
-              <div className="right col-span-12 xl:col-span-3">
-                <GenresLayout />
-                <Top10Layout />
               </div>
             </div>
             <Footer />

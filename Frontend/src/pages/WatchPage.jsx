@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useParams, useSearchParams } from "react-router-dom";
+import { Link, useParams, useSearchParams, Navigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import Player from "../components/Player";
 import Episodes from "../layouts/Episodes";
@@ -58,6 +58,11 @@ const WatchPage = () => {
     );
   }
 
+  // 🚫 BLOCK UPCOMING / NO EPISODES
+  if (Array.isArray(episodes) && episodes.length === 0) {
+    return <Navigate to={`/anime/${id}`} replace />;
+  }
+
   const currentEp =
     episodes &&
     ep !== null &&
@@ -65,7 +70,7 @@ const WatchPage = () => {
 
   const changeEpisode = (action) => {
     if (!currentEp) return;
-    
+
     if (action === "next") {
       const nextEp = episodes[currentEp.episodeNumber - 1 + 1];
       if (!nextEp) return;
@@ -77,8 +82,12 @@ const WatchPage = () => {
     }
   };
 
-  const hasNextEp = currentEp ? Boolean(episodes[currentEp.episodeNumber - 1 + 1]) : false;
-  const hasPrevEp = currentEp ? Boolean(episodes[currentEp.episodeNumber - 1 - 1]) : false;
+  const hasNextEp = currentEp
+    ? Boolean(episodes[currentEp.episodeNumber - 1 + 1])
+    : false;
+  const hasPrevEp = currentEp
+    ? Boolean(episodes[currentEp.episodeNumber - 1 - 1])
+    : false;
 
   const animeTitle = id ? id.split("-").slice(0, 2).join(" ") : "Anime";
   const safeEpNumber = currentEp?.episodeNumber ?? "1";

@@ -63,7 +63,7 @@ const Player = ({
       <div className="w-full bg-black aspect-video relative rounded-xl overflow-hidden shadow-2xl shadow-black/50">
         <iframe
           src={`https://${
-            server === "vidWish" ? "vidwish.live" : "megaplay.buzz"
+            server === "vidwish" ? "vidwish.live" : "megaplay.buzz"
           }/stream/s-2/${episodeId.split("ep=").pop()}/${category}`}
           width="100%"
           height="100%"
