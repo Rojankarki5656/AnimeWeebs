@@ -12,11 +12,12 @@ import useGenresStore from "../store/genresStore";
 import { useEffect } from "react";
 import useTopTenStore from "../store/toptenStore";
 import Footer from "../components/Footer";
+
 import { genres } from "../utils/genres";
 import { Helmet } from "react-helmet";
-
 const Home = () => {
   const { data, isLoading, error, isError } = useApi("/home");
+
   const setGenres = useGenresStore((state) => state.setGenres);
   const setTopTen = useTopTenStore((state) => state.setTopTen);
 
@@ -34,113 +35,46 @@ const Home = () => {
     notify("error", error.message);
     return;
   }
-
   return (
-    <div className="relative bg-gradient-to-b from-[#0a0a0f] via-gray-950 to-[#0a0a0f] min-h-screen">
+    <div className="relative">
       <Helmet>
-        <title> Watch Anime Online, Free Anime Streaming Online on watanuki Anime Website </title>
-        <meta name="description" content=" watanuki to is a free no ads anime site to watch free anime. Online anime streaming at watanuki with DUB, SUB in HD watanuki.shop." />
+        <title>
+          Watch Anime Online, Free Anime Streaming Online on watanuki Anime
+          Website
+        </title>
+        <meta
+          name="description"
+          content=" AnimeWeebs is a free site with no ads to watch anime. AnimeWeebs contains all the anime for a weebs to watch. Fucking Nerds !!!"
+        />
         <meta property="og:title" content="home - watanuki" />
       </Helmet>
-      
       {isLoading ? (
-        <Loader className="h-[100dvh] bg-[#0a0a0f]" />
+        <Loader className="h-[100dvh]" />
       ) : (
         <>
-          {/* Hero with overlay gradient */}
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 via-transparent to-transparent z-10 pointer-events-none"></div>
-            <HeroCarousel slides={data?.data?.spotlight} />
-          </div>
-          
-          <div className="xl:mx-8 px-3">
-            {/* Trending Section - Elevated */}
-            <div className="mt-4 mb-6">
-              <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-xl border border-gray-700 p-4 shadow-xl">
-                <TrendingLayout data={data?.data?.trending} />
-              </div>
-            </div>
-            
-            {/* Dynamic Layouts Grid - Professional & Cohesive */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 my-6">
-              <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg hover:shadow-2xl hover:border-blue-500/40 transition-all duration-300">
-                <DynamicLayout 
-                  title="Most Popular" 
-                  endpoint="most-popular" 
-                  data={data?.data?.mostPopular} 
+          <HeroCarousel slides={data?.data?.spotlight} />
+          <div className="xl:mx-10">
+            <TrendingLayout data={data?.data?.trending} />
+            <div className="row grid gap-2 justify-center grid-cols-12 sm:mx-20">
+              <div className="left col-span-12 xl:col-span-0">
+                <MainLayout
+                  title="Latest Episode"
+                  endpoint="recently-updated"
+                  data={data?.data?.latestEpisode}
                 />
-              </div>
-              
-              <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg hover:shadow-2xl hover:border-purple-500/40 transition-all duration-300">
-                <DynamicLayout 
-                  title="Most Favorite" 
-                  endpoint="most-favorite" 
-                  data={data?.data?.mostFavorite} 
+                <MainLayout
+                  title="New Added"
+                  endpoint="recently-added"
+                  data={data?.data?.newAdded}
                 />
-              </div>
-              
-              <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg hover:shadow-2xl hover:border-emerald-500/40 transition-all duration-300">
-                <DynamicLayout 
-                  title="Top Airing" 
-                  endpoint="top-airing" 
-                  data={data?.data?.topAiring} 
-                />
-              </div>
-              
-              <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg hover:shadow-2xl hover:border-amber-500/40 transition-all duration-300">
-                <DynamicLayout 
-                  title="Latest Completed" 
-                  endpoint="completed" 
-                  data={data?.data?.latestCompleted} 
+                <MainLayout
+                  title="Top Upcoming"
+                  endpoint="top-upcoming"
+                  data={data?.data?.topUpcoming}
                 />
               </div>
             </div>
-            
-            {/* Main Content Area - Professional Layout */}
-            <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 my-8">
-              {/* Left Column - Main Content */}
-              <div className="xl:col-span-9 space-y-4">
-                <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-xl border border-gray-700 p-4 shadow-xl">
-                  <MainLayout 
-                    title="Latest Episode" 
-                    endpoint="recently-updated" 
-                    data={data?.data?.latestEpisode} 
-                  />
-                </div>
-                
-                <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-xl border border-gray-700 p-4 shadow-xl">
-                  <MainLayout 
-                    title="New Added" 
-                    endpoint="recently-added" 
-                    data={data?.data?.newAdded} 
-                  />
-                </div>
-                
-                <div className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur-sm rounded-xl border border-gray-700 p-4 shadow-xl">
-                  <MainLayout 
-                    title="Top Upcoming" 
-                    endpoint="top-upcoming" 
-                    data={data?.data?.topUpcoming} 
-                  />
-                </div>
-              </div>
-              
-              {/* Right Column - Sidebar */}
-              <div className="xl:col-span-3 space-y-4">
-                <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg">
-                  <GenresLayout />
-                </div>
-                
-                <div className="bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 rounded-xl border border-gray-700 p-3 shadow-lg">
-                  <Top10Layout />
-                </div>
-              </div>
-            </div>
-            
-            {/* Footer */}
-            <div className="mt-6 pt-6 border-t border-gray-700/50">
-              <Footer />
-            </div>
+            <Footer />
           </div>
         </>
       )}
