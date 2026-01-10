@@ -52,26 +52,30 @@ const Home = () => {
         <Loader className="h-[100dvh]" />
       ) : (
         <>
-          <HeroCarousel slides={data?.data?.spotlight} />
+          <div className="relative">
+            <HeroCarousel slides={data?.data?.spotlight} />
+            {/* Fade overlay */}
+            <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-white to-transparent pointer-events-none"></div>
+          </div>{" "}
           <div className="xl:mx-10">
             <TrendingLayout data={data?.data?.trending} />
-              <div className="left col-span-12 xl:col-span-0">
-                <MainLayout
-                  title="Latest Episode"
-                  endpoint="recently-updated"
-                  data={data?.data?.latestEpisode}
-                />
-                <MainLayout
-                  title="New Added"
-                  endpoint="recently-added"
-                  data={data?.data?.newAdded}
-                />
-                <MainLayout
-                  title="Top Upcoming"
-                  endpoint="top-upcoming"
-                  data={data?.data?.topUpcoming}
-                />
-              </div>
+            <div className="left col-span-12 xl:col-span-0">
+              <MainLayout
+                title="Latest Episode"
+                endpoint="recently-updated"
+                data={data?.data?.latestEpisode}
+              />
+              <MainLayout
+                title="New Added"
+                endpoint="recently-added"
+                data={data?.data?.newAdded}
+              />
+              <MainLayout
+                title="Top Upcoming"
+                endpoint="top-upcoming"
+                data={data?.data?.topUpcoming}
+              />
+            </div>
             <Footer />
           </div>
         </>

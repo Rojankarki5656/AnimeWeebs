@@ -98,7 +98,7 @@ const MainLayout = ({ title, data, endpoint }) => {
                       className="text-xs px-2 py-0.5 rounded-full 
       bg-purple-500/10 text-purple-400 border border-purple-500/20"
                     >
-                      EPS {item.episodes.ep ?? 0}
+                      EPS {item.episodes.eps ?? 0}
                     </span>
                   </div>
                 )}
