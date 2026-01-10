@@ -5,7 +5,6 @@ import config from "../config/config";
 export const API_BASE_URL = config.localUrl
 
 const fetchData = async (url) => {
-  console.log(API_BASE_URL);
   try {
     const { data } = await axios.get(API_BASE_URL + url);
 

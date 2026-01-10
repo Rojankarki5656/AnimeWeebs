@@ -2,7 +2,6 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 const AZ = ({ selected }) => {
-  console.log(selected);
 
   selected = selected === null ? "All" : selected;
   const azList = [

@@ -36,7 +36,7 @@ const Home = () => {
     return;
   }
   return (
-    <div className="relative">
+    <div className="h-[100dvh] bg-grey[900] overflow-y-auto">
       <Helmet>
         <title>
           Watch Anime Online, Free Anime Streaming Online on watanuki Anime
@@ -55,7 +55,6 @@ const Home = () => {
           <HeroCarousel slides={data?.data?.spotlight} />
           <div className="xl:mx-10">
             <TrendingLayout data={data?.data?.trending} />
-            <div className="row grid gap-2 justify-center grid-cols-12 sm:mx-20">
               <div className="left col-span-12 xl:col-span-0">
                 <MainLayout
                   title="Latest Episode"
@@ -73,7 +72,6 @@ const Home = () => {
                   data={data?.data?.topUpcoming}
                 />
               </div>
-            </div>
             <Footer />
           </div>
         </>

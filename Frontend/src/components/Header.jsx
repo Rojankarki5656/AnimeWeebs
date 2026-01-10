@@ -125,7 +125,7 @@ const Header = () => {
 
       {/* Search Results - Premium Dropdown */}
       {(value.length > 2 && isMobileOpen) || (value.length > 2 && (
-        <div className="absolute w-full bg-gray-900/95 backdrop-blur-xl max-h-[60vh] overflow-y-auto border-t border-gray-800/50 shadow-2xl">
+        <div className="absolute right-0 w-[600px] bg-gray-900/95 backdrop-blur-xl max-h-[60vh] overflow-y-auto border-t border-gray-800/50 shadow-2xl">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
