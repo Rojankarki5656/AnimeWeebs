@@ -48,7 +48,7 @@ This project was created and developed by:
 
 * **Rojan** – *Team Leader & Full Stack Developer*
 * **Sweekar** – *Frontend Developer*
-* **Keshav** – *Frontend & UI Developer*
+* **Keshav** – *Backend Developer*
 
 ---
 
