@@ -1,7 +1,3 @@
-Here’s a clean and professional **README.md** for your project:
-
----
-
 # AnimeWeebs
 
 AnimeWeebs is a modern anime streaming and discovery web application that allows users to explore trending anime, view detailed information, and stream episodes seamlessly.
