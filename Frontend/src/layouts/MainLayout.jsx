@@ -93,6 +93,13 @@ const MainLayout = ({ title, data, endpoint }) => {
                     >
                       DUB {item.episodes.dub ?? 0}
                     </span>
+
+                    <span
+                      className="text-xs px-2 py-0.5 rounded-full 
+      bg-purple-500/10 text-purple-400 border border-purple-500/20"
+                    >
+                      EPS {item.episodes.ep ?? 0}
+                    </span>
                   </div>
                 )}
               </div>
