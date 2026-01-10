@@ -1,6 +1,6 @@
-# 📺 hianime-API
+# 📺 AnimeWeebs
 
-**hianime-API** is an unofficial REST API that scrapes anime data from **hianimez.to**.  
+**AnimeWeebs** is an unofficial REST API that scrapes anime data from **hianimez.to**.  
 It provides endpoints for anime discovery, details, episodes, servers, and streaming links.
 
 > ⚠️ **Important**
@@ -33,15 +33,6 @@ Install Bun → https://bun.sh/docs/installation
 
 ---
 
-### Local Setup
-
-```bash
-git clone https://github.com/yahyaMomin/hianime-API.git
-cd hianime-API
-bun install
-bun run dev
-```
-
 Server runs at:
 
 ```
@@ -58,14 +49,6 @@ http://localhost:3030/doc
 >
 > - You Cannot Run this Projct Directly Using Nodemon or node
 > - You Need to Build Project using tsup in ESM module To Run Using Node
-
----
-
----
-
-### Deploy on Render
-
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/yahyaMomin/hianime-API)
 
 ---
 
@@ -167,42 +150,4 @@ Returns HLS links, subtitles, intro/outro timestamps.
 
 ---
 
-## 👨‍💻 Development & Contribution
-
-- Pull requests welcome
-- Open issues for bugs or features
-
-Issues → https://github.com/yahyamomin/hianime-API/issues
-
----
-
-## 🎨 Frontend Example
-
-Reference frontend:
-
-https://github.com/yahyamomin/watanuki
-
----
-
-## ✨ Contributors
-
-[![Contributors](https://contrib.rocks/image?repo=yahyamomin/hianime-API)](https://github.com/yahyamomin/hianime-API/graphs/contributors)
-
----
-
-## 🤝 Credits
-
-- consumet.ts
-- api.consumet.org
-
----
-
-## 🌟 Support
-
-Star the repo if it helped you.
-
----
-
-## 📈 Star History
-
-![Star History](https://starchart.cc/yahyamomin/hianime-API.svg)
+Wake Up MFS
