@@ -62,3 +62,4 @@ To build a fast, responsive, and user-friendly anime streaming platform that pro
 
 🚧 Currently under active development.
 
+Note: This project is for educational and portfolio purposes. Please support the official releases of the anime you enjoy.
