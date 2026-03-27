@@ -6,6 +6,7 @@ import connectRedis from '@/utils/connectRedis';
 
 export default async function homeHandler() {
   const { exist, redis } = await connectRedis();
+  console.log("Exist: " + exist +" "+ "Redis: " +redis);
 
   if (!exist) {
     const result = await axiosInstance('/home');
