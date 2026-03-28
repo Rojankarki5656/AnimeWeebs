@@ -52,7 +52,7 @@ const ListPage = () => {
     <div className="list-page pt-14">
       <Helmet>
         <title>{category} animes</title>
-        <meta property="og:title" content="explore - watanuki" />
+        <meta property="og:title" content="explore - AnimeWeebs" />
       </Helmet>
       {category === "az-list" && <AZ selected={query} />}
       {pages && !isLoading ? (

@@ -39,14 +39,14 @@ const Home = () => {
     <div className="h-[100dvh] bg-grey[900] overflow-y-auto">
       <Helmet>
         <title>
-          Watch Anime Online, Free Anime Streaming Online on watanuki Anime
+          Watch Anime Online, Free Anime Streaming Online on AnimeWeebs Anime
           Website
         </title>
         <meta
           name="description"
           content=" AnimeWeebs is a free site with no ads to watch anime. AnimeWeebs contains all the anime for a weebs to watch. Fucking Nerds !!!"
         />
-        <meta property="og:title" content="home - watanuki" />
+        <meta property="og:title" content="home - AnimeWeebs" />
       </Helmet>
       {isLoading ? (
         <Loader className="h-[100dvh]" />
