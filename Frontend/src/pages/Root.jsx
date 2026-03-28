@@ -83,7 +83,7 @@ const Root = () => {
             >
               <div className="relative">
                 <div className="text-3xl md:text-4xl font-bold text-white">
-                  ANIME<span className="text-primary">HUB</span>
+                  ANIME<span className="text-primary">WEEBS</span>
                 </div>
                 <motion.div
                   animate={{ rotate: 360 }}
