@@ -9,7 +9,7 @@ const PageNotFound = () => {
     <div className="h-[100dvh] flex justify-center flex-col items-center">
       <Helmet>
         <title>404 PAGE NOT FOUND</title>
-        <meta property="og:title" content="PAGE NOT FOUND - watanuki" />
+        <meta property="og:title" content="PAGE NOT FOUND - AnimeWeebs" />
       </Helmet>
       <img
         className="max-w-80 mb-2 w-full h-auto"

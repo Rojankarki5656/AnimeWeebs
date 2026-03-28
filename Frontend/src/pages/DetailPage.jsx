@@ -64,7 +64,7 @@ const DetailPage = () => {
 
       <Helmet>
         <title>{titleId}</title>
-        <meta property="og:title" content="detail - watanuki" />
+        <meta property="og:title" content="detail - AnimeWeebs" />
       </Helmet>
       {data && !isLoading ? (
         <div className={`DetailPage relative pt-10 ${bigPoster && "blur-sm"} `}>

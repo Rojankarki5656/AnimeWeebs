@@ -22,10 +22,10 @@ const Footer = () => {
       <AZ />
       <div className="desclaimer mt-5 mb-2 flex flex-col justify-center items-center">
         <p className="text-sm text-center text-gray-500">
-          Watanuki does not store any files on our server, <br /> we only linked
+          AnimeWeebs does not store any files on our server, <br /> we only linked
           to the media which is hosted on 3rd party services.{" "}
         </p>
-        <p className="mt-4 text-gray-500">© watanuki All rights reserved.</p>
+        <p className="mt-4 text-gray-500">© AnimeWeebs All rights reserved.</p>
         <div className="btns flex justify-center my-2 items-center gap-2">
           <a
             href="https://github.com/yahyaMomin"
