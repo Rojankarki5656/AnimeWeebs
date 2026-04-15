@@ -28,7 +28,7 @@ const Footer = () => {
         <p className="mt-4 text-gray-500">© AnimeWeebs All rights reserved.</p>
         <div className="btns flex justify-center my-2 items-center gap-2">
           <a
-            href="https://github.com/yahyaMomin"
+            href="https://github.com/Rojankarki5656"
             target="_blank"
             className="text-gray-500 hover:text-white text-2xl"
           >
