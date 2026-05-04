@@ -17,7 +17,6 @@ import * as filter from '../modules/explore/filter/index';
 import * as episodes from '../modules/episodes/index';
 import * as servers from '../modules/servers/index';
 import * as stream from '../modules/stream/index';
-import * as proxy from '../modules/proxy/index';
 import * as monthlySchedule from '../modules/schedule/monthlySchedule/index';
 import * as nextEpSchedule from '../modules/schedule/nextEpSchedule/index';
 import * as meta from '../modules/meta/index';
@@ -42,7 +41,6 @@ const routes = [
   episodes,
   servers,
   stream,
-  proxy,
   monthlySchedule,
   nextEpSchedule,
   meta,

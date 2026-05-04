@@ -1,0 +1,9 @@
+# https://animeweebs.app/robots.txt
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /private/
+Disallow: /watch?*
+Disallow: /?*
+
+Sitemap: https://animeweebs.app/sitemap.xml

@@ -14,53 +14,105 @@ import { FaWindowClose } from "react-icons/fa";
 import VoiceActorsLayout from "../layouts/VoiceActorsLayout";
 import { useLocation } from "react-router-dom";
 
-
 const DetailPage = () => {
   const { state } = useLocation();
   const isUpcoming = state?.source === "top-upcoming";
   const { id } = useParams();
   const [bigPoster, setBigPoster] = useState(null);
 
-  const titleId = id.split("-").slice(0, -1).join(" ").replace(",", " ");
+  // Extract readable title from ID (fallback)
+  const titleId = id
+    ? id.split("-").slice(0, -1).join(" ").replace(",", " ")
+    : "Anime";
 
-  const showBigPoster = (url) => {
-    setBigPoster(url);
-  };
+  const showBigPoster = (url) => setBigPoster(url);
 
   const { data: response, isError, error, isLoading } = useApi(`/anime/${id}`);
   const data = response?.data;
 
-  if (isError) {
-    return <PageNotFound />;
-  }
+  if (isError) return <PageNotFound />;
+
+  // Build JSON‑LD schema (TVSeries / Movie)
+  const generateSchema = () => {
+    if (!data) return null;
+    const schema = {
+      "@context": "https://schema.org",
+      "@type": data.type === "Movie" ? "Movie" : "TVSeries",
+      "name": data.title,
+      "alternateName": data.alternativeTitle,
+      "description": data.synopsis?.substring(0, 500),
+      "image": data.poster,
+      "url": `https://animeweebs.com/anime/${id}`,
+      "genre": data.genres?.join(", "),
+      "datePublished": data.aired?.from || data.aired,
+      "duration": data.duration,
+      "productionCompany": data.studios || data.producers?.[0],
+      "aggregateRating": data.score ? {
+        "@type": "AggregateRating",
+        "ratingValue": data.score,
+        "bestRating": "10",
+        "ratingCount": data.reviewCount || 100,
+      } : undefined,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD",
+        "availability": "https://schema.org/InStock",
+        "url": `https://animeweebs.com/watch/${slugify(data.title)}-_${data.id}`,
+      },
+    };
+    return schema;
+  };
+
+  const slugify = (text) =>
+    text?.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") || "";
+
+  const schemaData = generateSchema();
 
   return (
-    <main className={`${bigPoster ? "h-dvh  overflow-hidden" : ""}`}>
+    <main className={`${bigPoster ? "h-dvh overflow-hidden" : ""}`}>
+      {/* Big Poster Modal (mobile‑friendly) */}
       {bigPoster && (
-        <div className="bigposter absolute flex justify-center items-center h-full w-full z-[100] bg-[#222831b4]">
-          <div className="poster bg-lightbg rounded-md flex aspect-auto object-cover flex-col items-end relative">
+        <div className="bigposter fixed inset-0 flex justify-center items-center z-[100] bg-black/90 p-4">
+          <div className="relative max-w-[90vw] max-h-[90vh] bg-gray-900 rounded-lg overflow-hidden">
             <button
               onClick={() => setBigPoster(null)}
-              className="absolute hover:text-primary bg-black text-2xl"
+              className="absolute top-2 right-2 z-10 bg-black/70 text-white p-2 rounded-full hover:bg-black transition"
+              aria-label="Close full poster"
             >
-              <FaWindowClose />
+              <FaWindowClose className="text-xl" />
             </button>
             <img
               src={bigPoster}
-              alt="poster"
-              className="rounded-md h-full w-full"
+              alt={`${data?.title || "Anime"} poster – watch free on AnimeWeebs`}
+              className="w-full h-full object-contain"
             />
           </div>
         </div>
       )}
 
+      {/* SEO Meta */}
       <Helmet>
-        <title>{titleId}</title>
-        <meta property="og:title" content="detail - AnimeWeebs" />
+        <html lang="en" />
+        <title>{data?.title ? `${data.title} – Watch Free Online on AnimeWeebs` : titleId}</title>
+        <meta name="description" content={data?.synopsis?.substring(0, 160) || `Watch ${data?.title} online free in HD. No ads, subbed & dubbed episodes.`} />
+        <meta name="keywords" content={`${data?.title}, watch ${data?.title} free, ${data?.title} online, free anime, animeweebs, subbed, dubbed, ${data?.genres?.join(", ")}`} />
+        <meta property="og:title" content={`${data?.title} – Free Anime Streaming on AnimeWeebs`} />
+        <meta property="og:description" content={data?.synopsis?.substring(0, 160)} />
+        <meta property="og:image" content={data?.poster} />
+        <meta property="og:url" content={`https://animeweebs.com/anime/${id}`} />
+        <meta name="twitter:card" content="summary_large_image" />
+        <link rel="canonical" href={`https://animeweebs.com/anime/${id}`} />
+        {schemaData && (
+          <script type="application/ld+json">
+            {JSON.stringify(schemaData)}
+          </script>
+        )}
       </Helmet>
+
       {data && !isLoading ? (
-        <div className={`DetailPage relative pt-10 ${bigPoster && "blur-sm"} `}>
-          <InfoLayout showBigPoster={showBigPoster} data={data} isUpcoming={isUpcoming}/>
+        <div className={`DetailPage relative pt-10 ${bigPoster && "blur-sm"}`}>
+          <InfoLayout showBigPoster={showBigPoster} data={data} isUpcoming={isUpcoming} />
 
           <div className="row grid items-start gap-3 px-2 grid-cols-12">
             <div
@@ -68,12 +120,9 @@ const DetailPage = () => {
                 data.related?.length > 0 ? "xl:col-span-9" : "xl:col-span-12"
               }`}
             >
-              {data.moreSeasons?.length > 0 && (
-                <MoreSeasons data={data.moreSeasons} />
-              )}
-              {/* <VoiceActorsLayout id={id} /> */}
+              {data.moreSeasons?.length > 0 && <MoreSeasons data={data.moreSeasons} />}
               {data.recommended && (
-                <div className="recomendation">
+                <div className="recommendation mt-8">
                   <Recommended data={data.recommended} />
                 </div>
               )}
