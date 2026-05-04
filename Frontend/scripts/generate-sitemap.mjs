@@ -6,7 +6,7 @@ const API_URL = process.env.VITE_APP_LOCALURL;
 
 async function fetchAnimeIds() {
   try {
-    const res = await fetch(`${API_URL}/api/v1/home`);
+    const res = await fetch(`${API_URL}/home`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     const spotlight = json?.data?.spotlight || [];
