@@ -2,12 +2,13 @@ import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import config from "../config/config";
 
-export const API_BASE_URL = config.localUrl
+export const API_BASE_URL = config.localUrl;
 
 const fetchData = async (url) => {
   try {
-    const { data } = await axios.get(API_BASE_URL + url);
-
+    const { data } = await axios.get(API_BASE_URL + url, {
+      timeout: 60000, // 60 seconds in milliseconds
+    });
     return data;
   } catch (error) {
     throw new Error(error);

@@ -8,7 +8,7 @@ import MostPopular from "../layouts/MostPopular";
 import MoreSeasons from "../layouts/MoreSeasons";
 import Related from "../layouts/Related";
 import Footer from "../components/Footer";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { FaWindowClose } from "react-icons/fa";
 import VoiceActorsLayout from "../layouts/VoiceActorsLayout";
@@ -18,18 +18,10 @@ import { useLocation } from "react-router-dom";
 const DetailPage = () => {
   const { state } = useLocation();
   const isUpcoming = state?.source === "top-upcoming";
-  console.log("Muji: ", state?.source);
   const { id } = useParams();
   const [bigPoster, setBigPoster] = useState(null);
 
   const titleId = id.split("-").slice(0, -1).join(" ").replace(",", " ");
-
-  const endsWithNumber = /\d$/;
-  const result = endsWithNumber.test(id);
-
-  if (!result) {
-    return <PageNotFound />;
-  }
 
   const showBigPoster = (url) => {
     setBigPoster(url);
@@ -68,7 +60,6 @@ const DetailPage = () => {
       </Helmet>
       {data && !isLoading ? (
         <div className={`DetailPage relative pt-10 ${bigPoster && "blur-sm"} `}>
-          {console.log("Is muji: ",isUpcoming)}
           <InfoLayout showBigPoster={showBigPoster} data={data} isUpcoming={isUpcoming}/>
 
           <div className="row grid items-start gap-3 px-2 grid-cols-12">
@@ -80,7 +71,7 @@ const DetailPage = () => {
               {data.moreSeasons?.length > 0 && (
                 <MoreSeasons data={data.moreSeasons} />
               )}
-              <VoiceActorsLayout id={id} />
+              {/* <VoiceActorsLayout id={id} /> */}
               {data.recommended && (
                 <div className="recomendation">
                   <Recommended data={data.recommended} />

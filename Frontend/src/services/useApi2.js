@@ -8,7 +8,7 @@ const fetchData2 = async (url) => {
     const { data } = await axios.get(API_BASE_URL + url)
     return data
   } catch (error) {
-    throw new Error(error)
+    throw error;
   }
 }
 

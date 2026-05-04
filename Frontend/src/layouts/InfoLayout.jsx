@@ -48,6 +48,11 @@ const InfoLayout = ({ data, showBigPoster, isUpcoming }) => {
     }
     return null;
   };
+  const slugify = (text) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
 
   const getProducers = (producers) => {
     if (!producers) return [];
@@ -69,7 +74,7 @@ const InfoLayout = ({ data, showBigPoster, isUpcoming }) => {
 
   const totalEpisodes = Math.max(
     data?.episodes?.sub || 0,
-    data?.episodes?.dub || 0
+    data?.episodes?.dub || 0,
   );
 
   const hasBothAudio = data?.episodes?.sub > 0 && data?.episodes?.dub > 0;
@@ -105,25 +110,6 @@ const InfoLayout = ({ data, showBigPoster, isUpcoming }) => {
                     <MdHighQuality />
                     {data.quality}
                   </span>
-                )}
-              </div>
-
-              {/* Stats */}
-              <div className="mt-4 grid grid-cols-4 gap-2">
-                <Stat label="EP" value={totalEpisodes} />
-                <Stat
-                  label="SCORE"
-                  value={data?.MAL_score || "N/A"}
-                  icon={<FaStar className="text-yellow-400" />}
-                />
-                <Stat label="MIN" value={data?.duration} />
-
-                {data?.is18Plus && (
-                  <Stat
-                    label="Age Rating"
-                    value="18+"
-                    className="text-red-400 font-bold"
-                  />
                 )}
               </div>
             </div>
@@ -185,14 +171,13 @@ const InfoLayout = ({ data, showBigPoster, isUpcoming }) => {
 
             {/* Actions */}
             <div className="flex flex-wrap gap-3 mt-7">
-              {console.log("Is muji: ",isUpcoming)}
               {isUpcoming ? (
                 <button className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md">
                   ➕ Add to List
                 </button>
               ) : (
                 <Link
-                  to={`/watch/${data?.id}`}
+                  to={`/watch/${slugify(data.title)}-_${data.id}`}
                   className="inline-flex items-center gap-3 px-6 py-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 transition font-semibold shadow-md"
                 >
                   <FaPlay />

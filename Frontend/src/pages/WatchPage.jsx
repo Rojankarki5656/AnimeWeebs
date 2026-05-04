@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, useParams, useSearchParams, Navigate } from "react-router-dom";
 import Loader from "../components/Loader";
 import Player from "../components/Player";
@@ -12,39 +12,133 @@ import {
   ChevronRight,
   Film,
   Clock,
-  Calendar,
   Share2,
-  Download,
   Bookmark,
 } from "lucide-react";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
+
+const normalizeEpisodeParam = (value) => {
+  if (!value) return null;
+
+  const matched = String(value).match(/\d+(?:\.\d+)?/);
+  return matched ? matched[0] : null;
+};
+
+const getEpisodeNumberFromEpisode = (episode) => {
+  if (!episode) return null;
+
+  const directNumber = Number(episode.episodeNumber);
+  if (Number.isFinite(directNumber) && directNumber > 0) {
+    return directNumber;
+  }
+
+  const id = String(episode.id || "");
+  const episodeMatch = id.match(/(?:^|-)episode-(\d+)(?:$|[/?#])/i);
+  if (episodeMatch) {
+    return Number(episodeMatch[1]);
+  }
+
+  const numericMatch = id.match(/(\d+(?:\.\d+)?)(?!.*\d)/);
+  return numericMatch ? Number(numericMatch[1]) : null;
+};
+
+const getEpisodeParam = (episode) => {
+  const episodeNumber = getEpisodeNumberFromEpisode(episode);
+  return episodeNumber ? String(episodeNumber) : null;
+};
+
+const humanizeSlug = (value = "") =>
+  decodeURIComponent(String(value))
+    .replace(/[-_]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+
+const parseWatchSlug = (rawSlug = "") => {
+  if (!rawSlug) {
+    return { animeId: "", animeTitle: "" };
+  }
+
+  const cleanedSlug = decodeURIComponent(rawSlug.split("?")[0]);
+
+  const episodePattern = cleanedSlug.match(/^(.*)-episode-(\d+)$/i);
+  if (episodePattern) {
+    return {
+      animeId: episodePattern[1],
+      animeTitle: humanizeSlug(episodePattern[1]),
+    };
+  }
+
+  if (cleanedSlug.includes("-_")) {
+    const [titlePart, idPart] = cleanedSlug.split("-_");
+    return {
+      animeId: idPart || "",
+      animeTitle: titlePart
+        ? decodeURIComponent(titlePart)
+            .replace(/-/g, " ")
+            .trim()
+        : "",
+    };
+  }
+
+  return {
+    animeId: cleanedSlug,
+    animeTitle: humanizeSlug(cleanedSlug),
+  };
+};
 
 const WatchPage = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
+  const { animeId: id, animeTitle: parsedAnimeTitle } = parseWatchSlug(
+    slug || ""
+  );
+  console.log("Raw slug from URL:", slug);
+  console.log("Parsed ID:", id);
+  console.log("Parsed Title:", parsedAnimeTitle);
   const [searchParams, setSearchParams] = useSearchParams();
   const [layout, setLayout] = useState("column");
   const [showEpisodeList, setShowEpisodeList] = useState(true);
 
-  const ep = searchParams.get("ep");
+  const ep = normalizeEpisodeParam(searchParams.get("ep"));
 
   const { data, isError, isLoading } = useApi(`/episodes/${id}`);
-  const episodes = data?.data || [];
 
-  const updateParams = (newParam) => {
+  const episodes = useMemo(() => data?.data || [], [data]);
+
+  const updateParams = useCallback((newParam) => {
+    const normalizedEp = normalizeEpisodeParam(newParam);
+    if (!normalizedEp) return;
+
     setSearchParams((prev) => {
       const newParams = new URLSearchParams(prev);
-      newParams.set("ep", newParam);
+      newParams.set("ep", normalizedEp);
       return newParams;
     });
-  };
+  }, [setSearchParams]);
 
   // Auto-redirect to first episode if no `ep` param exists
   useEffect(() => {
     if (!ep && Array.isArray(episodes) && episodes.length > 0) {
-      const ep = episodes[0].id.split("ep=").pop();
-      updateParams(ep);
+      const firstEpisode = getEpisodeParam(episodes[0]);
+      if (firstEpisode) {
+        updateParams(firstEpisode);
+      }
     }
-  }, [ep, episodes, setSearchParams]);
+  }, [ep, episodes, updateParams]);
+
+  useEffect(() => {
+    if (!ep || !episodes.length) return;
+
+    const hasMatchingEpisode = episodes.some(
+      (episode) => normalizeEpisodeParam(getEpisodeParam(episode)) === ep
+    );
+
+    if (!hasMatchingEpisode) {
+      const firstEpisode = getEpisodeParam(episodes[0]);
+      if (firstEpisode) {
+        updateParams(firstEpisode);
+      }
+    }
+  }, [ep, episodes, updateParams]);
 
   if (isError) {
     return <PageNotFound />;
@@ -66,38 +160,55 @@ const WatchPage = () => {
   const currentEp =
     episodes &&
     ep !== null &&
-    episodes.find((e) => e.id.split("ep=").pop() === ep);
+    episodes.find(
+      (episode) => normalizeEpisodeParam(getEpisodeParam(episode)) === ep
+    );
 
   const changeEpisode = (action) => {
     if (!currentEp) return;
 
+    const currentIndex = episodes.findIndex(
+      (episode) =>
+        normalizeEpisodeParam(getEpisodeParam(episode)) ===
+        normalizeEpisodeParam(getEpisodeParam(currentEp))
+    );
+
+    if (currentIndex === -1) return;
+
     if (action === "next") {
-      const nextEp = episodes[currentEp.episodeNumber - 1 + 1];
+      const nextEp = episodes[currentIndex + 1];
       if (!nextEp) return;
-      updateParams(nextEp.id.split("ep=").pop());
+      updateParams(getEpisodeParam(nextEp));
     } else {
-      const prevEp = episodes[currentEp.episodeNumber - 1 - 1];
+      const prevEp = episodes[currentIndex - 1];
       if (!prevEp) return;
-      updateParams(prevEp.id.split("ep=").pop());
+      updateParams(getEpisodeParam(prevEp));
     }
   };
 
-  const hasNextEp = currentEp
-    ? Boolean(episodes[currentEp.episodeNumber - 1 + 1])
+  const currentEpisodeIndex = currentEp
+    ? episodes.findIndex(
+        (episode) =>
+          normalizeEpisodeParam(getEpisodeParam(episode)) ===
+          normalizeEpisodeParam(getEpisodeParam(currentEp))
+      )
+    : -1;
+
+  const hasNextEp = currentEpisodeIndex > -1
+    ? Boolean(episodes[currentEpisodeIndex + 1])
     : false;
-  const hasPrevEp = currentEp
-    ? Boolean(episodes[currentEp.episodeNumber - 1 - 1])
+  const hasPrevEp = currentEpisodeIndex > -1
+    ? Boolean(episodes[currentEpisodeIndex - 1])
     : false;
 
-  const animeTitle = id ? id.split("-").slice(0, 2).join(" ") : "Anime";
-  const safeEpNumber = currentEp?.episodeNumber ?? "1";
+  const animeTitle = parsedAnimeTitle?.toUpperCase() || "Anime";
+  const safeEpNumber = getEpisodeNumberFromEpisode(currentEp) ?? ep ?? "1";
   const title = `Watch ${animeTitle} Episode ${safeEpNumber} Online | AnimeWeebs`;
   const description = `Watch ${animeTitle} Episode ${safeEpNumber} online for free on AnimeWeebs Anime. HD streaming with multiple servers and audio tracks.`;
   const ogTitle = `${animeTitle} Episode ${safeEpNumber} - AnimeWeebs`;
 
   // Determine if we should show detailed view
   const showDetailedView = episodes.length <= 50;
-
   return (
     <div className="min-h-screen pt-20 bg-gradient-to-br from-gray-900 to-black">
       <Helmet>
@@ -112,7 +223,7 @@ const WatchPage = () => {
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm">
             <Link
-              to="/"
+              to="/home"
               className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <Home className="w-4 h-4" />
@@ -121,7 +232,8 @@ const WatchPage = () => {
             <ChevronRight className="w-4 h-4 text-gray-600" />
             <Link
               to={`/anime/${id}`}
-              className="text-gray-400 hover:text-white transition-colors truncate max-w-xs"
+              title={animeTitle}
+              className="text-gray-400 hover:text-white transition-colors block truncate max-w-xs"
             >
               {animeTitle}
             </Link>
@@ -171,8 +283,8 @@ const WatchPage = () => {
               {/* Player */}
               {ep && id && currentEp && (
                 <Player
-                  id={id}
-                  episodeId={`${id}?ep=${ep}`}
+                  episodeId={currentEp.id}
+                  token={currentEp.token}
                   currentEp={currentEp}
                   changeEpisode={changeEpisode}
                   hasNextEp={hasNextEp}
@@ -237,12 +349,12 @@ const WatchPage = () => {
                     </div>
                     <div className="text-xs text-gray-400">Total</div>
                   </div>
-                  <div className="bg-gray-800/50 rounded-lg p-3 text-center">
+                  {/* <div className="bg-gray-800/50 rounded-lg p-3 text-center">
                     <div className="text-lg font-bold text-white">
                       {episodes.filter((e) => e.isFiller).length}
                     </div>
                     <div className="text-xs text-gray-400">Filler</div>
-                  </div>
+                  </div> */}
                 </div>
               </div>
 
@@ -259,6 +371,8 @@ const WatchPage = () => {
                     episodes={episodes}
                     currentEp={currentEp}
                     layout={showDetailedView ? layout : "column"}
+                    animeId={id}
+                    animeTitle={animeTitle}
                   />
                 </div>
 

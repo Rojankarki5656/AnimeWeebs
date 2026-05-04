@@ -37,7 +37,7 @@ const App = () => {
           <Route path="/anime/:id" element={<DetailPage />} />
           <Route path="/animes/:category/:query?" element={<ListPage />} />
           <Route path="/search" element={<SearchResult />} />
-          <Route path="/watch/:id" element={<WatchPage />} />
+          <Route path="/watch/:slug" element={<WatchPage />} />
           <Route path="/characters/:id" element={<CharactersPage />} />
           <Route path="/people/:id" element={<PeopleInfoPage />} />
           <Route path="/character/:id" element={<CharacterInfoPage />} />

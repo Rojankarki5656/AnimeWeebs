@@ -2,7 +2,7 @@ import React from "react";
 import pageNotFound from "../assets/404.png";
 import { Link } from "react-router-dom";
 import { FaAngleLeft } from "react-icons/fa";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const PageNotFound = () => {
   return (

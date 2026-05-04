@@ -14,7 +14,7 @@ import useTopTenStore from "../store/toptenStore";
 import Footer from "../components/Footer";
 
 import { genres } from "../utils/genres";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 const Home = () => {
   const { data, isLoading, error, isError } = useApi("/home");
 
@@ -23,7 +23,7 @@ const Home = () => {
 
   useEffect(() => {
     setGenres(genres);
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (data?.data) {

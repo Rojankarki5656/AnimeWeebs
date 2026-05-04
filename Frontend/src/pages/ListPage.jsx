@@ -9,7 +9,7 @@ import Heading from "../components/Heading";
 import AZ from "../layouts/AZ";
 import React from "react";
 import Footer from "../components/Footer";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const ListPage = () => {
   const validateQueries = [

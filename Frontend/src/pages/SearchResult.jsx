@@ -6,7 +6,7 @@ import Heading from "../components/Heading";
 import InfiniteScroll from "react-infinite-scroll-component";
 import Image from "../components/Image";
 import Footer from "../components/Footer";
-import { Helmet } from "react-helmet";
+import { Helmet } from "react-helmet-async";
 
 const SearchResult = () => {
   const [searchParams] = useSearchParams();

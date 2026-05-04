@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Embedded Player</title>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    header {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 24px;
+      color: #38bdf8;
+    }
+
+    .iframe-container {
+      position: relative;
+      width: 90%;
+      max-width: 1000px;
+      aspect-ratio: 16 / 9;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      background: #020617;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+
+    /* Loader */
+    .loader {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #020617;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid #334155;
+      border-top: 4px solid #38bdf8;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    footer {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Embedded Content Viewer</h1>
+  </header>
+
+  <div class="iframe-container">
+    <div class="loader" id="loader">
+      <div class="spinner"></div>
+    </div>
+
+    <iframe 
+      src="https://rrr.hub26link.site/prjp/c6/h9ac41b5fc66bd2c7fc5f1a108b24cbea4e3bf97cf39e146c858176939001128cc931550cd7fbe9d1f616719c4e56af64dc9a994e2914227b97dec1b3e76745efb2b1ed59f96e30cff9c0c3c13d/list,3I1YCZMgsMvr.m3u8"
+      allowfullscreen
+      onload="document.getElementById('loader').style.display='none'">
+    </iframe>
+  </div>
+
+  <footer>
+    Powered by your app
+  </footer>
+
+</body>
+</html>

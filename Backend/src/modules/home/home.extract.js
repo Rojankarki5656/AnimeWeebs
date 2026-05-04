@@ -2,7 +2,6 @@ import { commonAnimeObj, episodeObj } from "@/utils/commonAnimeObj";
 import { load } from "cheerio";
 
 export default function homeExtract(html) {
-  console.log("Extracting home page data...");
   const $ = load(html);
 
   const response = {

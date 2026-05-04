@@ -1,18 +1,16 @@
 /* eslint-disable react/prop-types */
 import { Link } from "react-router-dom";
-import Heading from "../components/Heading";
-import Image from "../components/Image";
-import { FaAngleRight } from "react-icons/fa";
 import {
-  Star,
   TrendingUp,
-  Clock,
-  Eye,
-  Sparkles,
   ChevronRight,
 } from "lucide-react";
 
 const MainLayout = ({ title, data, endpoint }) => {
+  const slugify = (text) =>
+    text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "");
   return (
     <section className="mt-12 relative">
       {/* Decorative Background */}
@@ -35,13 +33,20 @@ const MainLayout = ({ title, data, endpoint }) => {
 
       {/* Recommended Grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 md:gap-6">
-        {data.map((item, index) => (
-          <Link
-            key={item.id}
-            to={`/anime/${item.id}`}
-            state={{ source: endpoint }} // "top-upcoming"
-            className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/80 to-gray-950/80 backdrop-blur-sm border border-gray-800 hover:border-orange-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10"
-          >
+        {data.map((item, index) => {
+          const watchId = item.detailId || item.id;
+          const watchPath =
+            title === "Latest Episode" && watchId
+              ? `/watch/${slugify(item.title)}-_${watchId}?ep=${item.episodes?.sub ?? 0}`
+              : `/anime/${item.id}`;
+
+          return (
+            <Link
+              key={item.id}
+              to={watchPath}
+              state={{ source: endpoint }} // "top-upcoming"
+              className="group relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900/80 to-gray-950/80 backdrop-blur-sm border border-gray-800 hover:border-orange-500/50 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-500/10"
+            >
             {/* Ranking Badge */}
             {index < 3 && (
               <div className="absolute top-3 left-3 z-10">
@@ -114,8 +119,9 @@ const MainLayout = ({ title, data, endpoint }) => {
                 </span>
               </div>
             </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
     </section>
   );

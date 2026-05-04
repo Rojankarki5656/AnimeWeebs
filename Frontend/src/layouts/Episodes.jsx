@@ -1,15 +1,43 @@
 /* eslint-disable react/prop-types */
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   Play,
   AlertTriangle,
   ChevronDown,
-  Grid3x3,
-  List,
 } from "lucide-react";
 
-const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
+const slugify = (text = "") =>
+  String(text)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const getEpisodeNumber = (episode) => {
+  if (!episode) return null;
+
+  const directNumber = Number(episode.episodeNumber);
+  if (Number.isFinite(directNumber) && directNumber > 0) {
+    return directNumber;
+  }
+
+  const id = String(episode.id || "");
+  const episodeMatch = id.match(/(?:^|-)episode-(\d+)(?:$|[/?#])/i);
+  if (episodeMatch) {
+    return Number(episodeMatch[1]);
+  }
+
+  const numericMatch = id.match(/(\d+(?:\.\d+)?)(?!.*\d)/);
+  return numericMatch ? Number(numericMatch[1]) : null;
+};
+
+const Episodes = ({
+  episodes = [],
+  currentEp,
+  layout = "column",
+  animeId = "",
+  animeTitle = "",
+}) => {
   const totalEpisodes = episodes.length;
   const showNumberOnly = totalEpisodes > 50;
   const chunkSize = 100;
@@ -28,21 +56,32 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
 
   const [selectedRangeIndex, setSelectedRangeIndex] = useState(0);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const currentEpisodeNumber = getEpisodeNumber(currentEp);
+
+  const buildWatchPath = (episode) => {
+    const episodeNumber = getEpisodeNumber(episode);
+    const safeEpisodeNumber = episodeNumber ?? 1;
+
+    if (animeId) {
+      const titlePart = slugify(animeTitle || currentEp?.title || episode?.title || "watch");
+      return `/watch/${titlePart}-_${animeId}?ep=${safeEpisodeNumber}`;
+    }
+
+    return `/watch/${episode?.id || ""}?ep=${safeEpisodeNumber}`;
+  };
 
   // Auto-select range containing current episode
   useEffect(() => {
     if (!currentEp || !ranges.length) return;
 
     const epIndex = episodes.findIndex(
-      (ep) =>
-        ep.id?.split("ep=").pop() ===
-        currentEp.id?.split("ep=").pop()
+      (ep) => getEpisodeNumber(ep) === currentEpisodeNumber,
     );
 
     if (epIndex !== -1) {
       setSelectedRangeIndex(Math.floor(epIndex / chunkSize));
     }
-  }, [currentEp, episodes, ranges]);
+  }, [currentEp, currentEpisodeNumber, episodes, ranges]);
 
   if (!episodes.length) {
     return (
@@ -52,14 +91,12 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
     );
   }
 
-  const isCurrent = (ep) =>
-    ep.id?.split("ep=").pop() ===
-    currentEp?.id?.split("ep=").pop();
+  const isCurrent = (ep) => getEpisodeNumber(ep) === currentEpisodeNumber;
 
   const visibleEpisodes = showNumberOnly
     ? episodes.slice(
-        ranges[selectedRangeIndex].start,
-        ranges[selectedRangeIndex].end
+        ranges[selectedRangeIndex]?.start ?? 0,
+        ranges[selectedRangeIndex]?.end ?? totalEpisodes,
       )
     : episodes;
 
@@ -75,7 +112,7 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
         data-current={current || undefined}
         className="group relative"
       >
-        <Link to={`/watch/${episode.id.replaceAll("::", "?")}`}>
+        <Link to={buildWatchPath(episode)}>
           <div
             className={`
               aspect-square flex items-center justify-center rounded-lg border transition
@@ -88,7 +125,7 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
               }
             `}
           >
-            {episode.episodeNumber}
+            {getEpisodeNumber(episode) ?? episode.episodeNumber ?? "-"}
 
             {episode.isFiller && !current && (
               <AlertTriangle className="absolute top-1 right-1 w-3 h-3 text-amber-400" />
@@ -111,7 +148,7 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
 
     return (
       <li key={episode.id}>
-        <Link to={`/watch/${episode.id.replaceAll("::", "?")}`}>
+        <Link to={buildWatchPath(episode)}>
           <div
             className={`
               flex items-center gap-4 p-4 rounded-xl border transition
@@ -123,11 +160,11 @@ const Episodes = ({ episodes = [], currentEp, layout = "column" }) => {
             `}
           >
             <div className="w-12 h-12 flex items-center justify-center rounded-lg bg-gray-800 text-white font-bold">
-              {episode.episodeNumber}
+              {getEpisodeNumber(episode) ?? episode.episodeNumber ?? "-"}
             </div>
             <div className="flex-1">
               <h3 className="text-white">
-                Episode {episode.episodeNumber}
+                Episode {getEpisodeNumber(episode) ?? episode.episodeNumber ?? "-"}
               </h3>
             </div>
             <Play className="w-5 h-5 text-primary" />

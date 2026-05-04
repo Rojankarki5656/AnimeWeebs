@@ -58,7 +58,7 @@ export function HeroCarousel({ slides }) {
 
                 <div className="flex gap-4">
                   <Link
-                    to={`/watch/${item.id}`}
+                    to={`/anime/${item.id}`}
                     className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3 rounded-lg flex items-center gap-2 font-semibold transition"
                   >
                     <Play size={20} />
