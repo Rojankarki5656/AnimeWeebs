@@ -2,7 +2,7 @@ import { writeFileSync } from 'fs';
 import { resolve } from 'path';
 
 const SITE_URL = 'https://animeweebs.app';
-const API_URL = 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL;
 
 async function fetchAnimeIds() {
   try {
