@@ -1,7 +1,4 @@
-import React from "react";
 import Logo from "./Logo";
-import { Link } from "react-router-dom";
-import Heading from "./Heading";
 import AZ from "../layouts/AZ";
 import { FaGithub, FaTelegram } from "react-icons/fa6";
 

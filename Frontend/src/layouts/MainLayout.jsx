@@ -30,7 +30,7 @@ const MainLayout = ({ title, data, endpoint }) => {
           </HeadingTag>
         </div>
         <Link
-          to={`/anime/${endpoint}`}
+          to={`/list/${endpoint}`}
           className="group flex items-center gap-1 text-sm font-medium 
              text-orange-400 hover:text-orange-300 transition-colors"
           aria-label={`View more ${title.toLowerCase()} – free anime online`}

@@ -11,7 +11,6 @@ import Footer from "../components/Footer";
 import { Helmet } from "react-helmet-async";
 import { useState } from "react";
 import { FaWindowClose } from "react-icons/fa";
-import VoiceActorsLayout from "../layouts/VoiceActorsLayout";
 import { useLocation } from "react-router-dom";
 
 const DetailPage = () => {

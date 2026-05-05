@@ -1,5 +1,4 @@
 /* eslint-disable react/prop-types */
-import React from 'react'
 import { FaClosedCaptioning, FaMicrophone } from 'react-icons/fa'
 
 const SoundsInfo = ({ episodes }) => {

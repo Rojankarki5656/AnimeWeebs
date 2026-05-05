@@ -1,4 +1,3 @@
-import React from "react";
 import { FaFire, FaHeart, FaPlayCircle, FaCheckCircle, FaStar, FaTv } from "react-icons/fa";
 
 const Heading = ({ children, className, icon }) => {

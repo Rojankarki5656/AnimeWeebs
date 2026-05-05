@@ -82,6 +82,7 @@ const WatchPage = () => {
   const ep = normalizeEpisodeParam(searchParams.get("ep"));
 
   const { data, isError, isLoading } = useApi(`/episodes/${id}`);
+  console.log("Episodes API Response:", data);
 
   const episodes = useMemo(() => data?.data || [], [data]);
 
@@ -237,10 +238,6 @@ const WatchPage = () => {
           <Link to="/" className="flex items-center gap-1 text-gray-400 hover:text-white transition">
             <Home className="w-4 h-4" />
             <span className="hidden sm:inline">Home</span>
-          </Link>
-          <ChevronRight className="w-4 h-4 text-gray-600" />
-          <Link to={`/anime/${id}`} className="text-gray-400 hover:text-white truncate max-w-[150px] sm:max-w-xs">
-            {animeTitle}
           </Link>
           <ChevronRight className="w-4 h-4 text-gray-600" />
           <span className="text-primary font-medium truncate">Episode {safeEpNumber}</span>

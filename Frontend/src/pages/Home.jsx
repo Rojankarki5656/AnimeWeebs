@@ -182,7 +182,7 @@ const Home = () => {
               <section aria-labelledby="latest-episodes-heading">
                 <MainLayout
                   title="Latest Episode"
-                  endpoint="recently-updated"
+                  endpoint="recentlyupdates"
                   data={data?.data?.latestEpisode}
                 />
               </section>
@@ -191,7 +191,7 @@ const Home = () => {
               <section aria-labelledby="new-added-heading">
                 <MainLayout
                   title="New Added"
-                  endpoint="recently-added"
+                  endpoint="new-releases"
                   data={data?.data?.newAdded}
                 />
               </section>

@@ -99,7 +99,7 @@ export function HeroCarousel({ slides }) {
                 "name": item.title,
                 "description": item.synopsis,
                 "image": item.poster,
-                "url": `https://animeweebs.app/anime/${item.id}`,
+                "url": `https://animeweebs.com/anime/${item.id}`,
                 "keywords": "watch free, no ads, online streaming",
                 "offers": {
                   "@type": "Offer",

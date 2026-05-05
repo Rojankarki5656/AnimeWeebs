@@ -5,32 +5,36 @@ export default function suggestionExtract(html) {
   const $ = load(html);
 
   const response = [];
-  const allEl = $('.nav-item');
-  const items = allEl.splice(0, allEl.length - 2);
-  $(items).each((i, el) => {
+
+  $('.aitem').each((i, el) => {
     const obj = {
       ...commonAnimeObj,
       aired: null,
       type: null,
       duration: null,
     };
-    obj.id = $(el).attr('href').split('/').pop().split('?').at(0);
-    obj.poster = $(el).find('.film-poster-img').attr('data-src') || null;
-    const titleEL = $(el).find('.film-name');
-    obj.title = titleEL.text() || null;
-    obj.alternativeTitle = titleEL.attr('data-jname') || null;
-    const infoEl = $(el).find('.film-infor');
-    obj.aired = infoEl.find('span').first().text() || null;
-    obj.type = infoEl
-      .contents()
-      .filter(function () {
-        return this.type === 'text' && $(this).text().trim() !== ''; // Filter for non-empty text nodes
-      })
-      .text()
-      .trim();
-    obj.duration = infoEl.find('span').last().text() || null;
+
+    // ID
+    const href = $(el).attr('href');
+    obj.id = href?.split('/').pop() || null;
+
+    // Poster
+    obj.poster = $(el).find('img').attr('src') || null;
+
+    // Title
+    const titleEl = $(el).find('.title');
+    obj.title = titleEl.text().trim() || null;
+    obj.alternativeTitle = titleEl.attr('data-jp') || null;
+
+    // Info
+    const infoSpans = $(el).find('.info span');
+
+    obj.aired = infoSpans.eq(2)?.text() || null; // year
+    obj.type = infoSpans.eq(3)?.text() || null;  // TV/Movie
+    obj.duration = null; // not available here
 
     response.push(obj);
-  }).f;
+  });
+
   return response;
 }

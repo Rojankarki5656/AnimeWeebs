@@ -3,7 +3,6 @@ import { Search, Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useApi } from "../services/useApi";
 import useSidebarStore from "../store/sidebarStore";
-import Loader from "./Loader";
 import Logo from "./Logo";
 
 const Header = () => {
@@ -28,6 +27,7 @@ const Header = () => {
     }, 500);
   };
 
+  // API call – now returns { items, count, moreLink, success, keyword }
   const { data, isLoading } = useApi(
     debouncedValue.length > 2
       ? `/suggestion?keyword=${debouncedValue}`
@@ -41,7 +41,7 @@ const Header = () => {
   };
 
   const navigateToAnimePage = (id) => {
-    navigate(`/anime/${id}`);
+    navigate(`/anime/${id}`); // or `/anime/${id}` depending on your route
     resetSearch();
   };
 
@@ -51,6 +51,9 @@ const Header = () => {
     setIsMobileOpen(false);
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
   };
+
+  // Extract items array from response
+  const searchItems = data?.data || [];
 
   return (
     <nav className="fixed top-0 w-full z-50 bg-gradient-to-b from-black/95 via-black/80 to-transparent backdrop-blur-xl border-b border-gray-800/50">
@@ -66,7 +69,7 @@ const Header = () => {
           <Logo />
         </div>
 
-        {/* Desktop Search - Premium Styling */}
+        {/* Desktop Search */}
         <form
           onSubmit={handleSubmit}
           className="hidden md:flex relative flex-1 max-w-xl"
@@ -103,7 +106,7 @@ const Header = () => {
         </button>
       </div>
 
-      {/* Mobile Search Panel - Smooth Transition */}
+      {/* Mobile Search Panel */}
       {isMobileOpen && (
         <div className="md:hidden bg-black/95 backdrop-blur-xl border-t border-gray-800/50 p-4 animate-slideDown">
           <form onSubmit={handleSubmit} className="relative">
@@ -123,24 +126,24 @@ const Header = () => {
         </div>
       )}
 
-      {/* Search Results - Premium Dropdown */}
+      {/* Search Results Dropdown */}
       {(value.length > 2 && isMobileOpen) || (value.length > 2 && (
         <div className="absolute right-0 w-[600px] bg-gray-900/95 backdrop-blur-xl max-h-[60vh] overflow-y-auto border-t border-gray-800/50 shadow-2xl">
           {isLoading ? (
             <div className="flex justify-center py-8">
               <div className="w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
-          ) : data?.data?.length ? (
+          ) : searchItems.length > 0 ? (
             <>
               <div className="px-4 py-3 border-b border-gray-800/50">
                 <p className="text-sm text-gray-400">
-                  Found {data.data.length} results
+                  Found {searchItems.length} results
                 </p>
               </div>
               
-              {data.data.map((item) => (
+              {searchItems.map((item) => (
                 <div
-                  key={item.id}
+                  key={item.slug}
                   onClick={() => navigateToAnimePage(item.id)}
                   className="flex gap-4 px-4 py-3 hover:bg-gray-800/70 cursor-pointer group border-b border-gray-800/30 last:border-b-0 transition-colors duration-200"
                 >
@@ -157,14 +160,14 @@ const Header = () => {
                       {item.title}
                     </h4>
                     <p className="text-sm text-gray-400 line-clamp-1">
-                      {item.alternativeTitle}
+                      {item.japaneseTitle}
                     </p>
                     <div className="flex items-center gap-2 mt-1">
                       <span className="text-xs px-2 py-1 bg-gray-800/50 rounded text-gray-300">
                         {item.type || "TV"}
                       </span>
                       <span className="text-xs px-2 py-1 bg-blue-900/30 rounded text-blue-300">
-                        Score: {item.score || "N/A"}
+                        {item.rating || "N/A"}
                       </span>
                     </div>
                   </div>
