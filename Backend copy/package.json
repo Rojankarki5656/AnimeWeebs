@@ -2,6 +2,7 @@
   "name": "hianime-api",
   "module": "index.js",
   "type": "module",
+  "main": "index.js",
   "private": true,
   "peerDependencies": {
     "typescript": "^5.8.3"
