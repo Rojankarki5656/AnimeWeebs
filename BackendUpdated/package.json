@@ -18,7 +18,7 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix && prettier . --write",
     "dev": "bun --hot index.js",
-    "start": "bun index.js",
+    "start": "node index.js",
     "test": "vitest"
   },
   "dependencies": {

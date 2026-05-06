@@ -27,8 +27,21 @@ const SearchResult = () => {
 
   const pages = data?.pages;
 
+  // Check if there are any items
+  const hasItems = pages?.some(page => page.items?.length > 0);
+  
+  if (!hasItems && !isLoading) {
+    return (
+      <div className="flex justify-center items-center h-dvh">
+        <h1 className="font-bold text-2xl">
+          No results found for "{keyword}"
+        </h1>
+      </div>
+    );
+  }
+
   const totalItems =
-    pages?.reduce((total, page) => total + page.data.response.length, 0) || 0;
+    pages?.reduce((total, page) => total + (page.items?.length || 0), 0) || 0;
 
   return (
     <div className="list-page pt-20">
@@ -52,8 +65,8 @@ const SearchResult = () => {
           <div className="flex flex-wrap justify-around items-start mb-8 px-4">
             {pages.map((page, pageIndex) => (
               <React.Fragment key={pageIndex}>
-                {page.data.response.map((item, index) => (
-                  <div key={`${item.id}-${index}`} className="flw-item">
+                {page.items?.map((item, index) => (
+                  <div key={`${item.slug}-${index}`} className="flw-item">
                     <Image data={item} />
                   </div>
                 ))}

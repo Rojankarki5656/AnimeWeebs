@@ -7,7 +7,7 @@ export const API_BASE_URL = config.localUrl;
 const fetchData = async (url) => {
   try {
     const { data } = await axios.get(API_BASE_URL + url, {
-      timeout: 60000, // 60 seconds in milliseconds
+      timeout: 60000,
     });
     return data;
   } catch (error) {
@@ -27,24 +27,28 @@ export const useApi = (endpoint) => {
 
 const fetchInfiniteData = async ({ queryKey, pageParam }) => {
   try {
-    const { data } = await axios.get(API_BASE_URL + queryKey + pageParam);
+    // Remove the last '&' or handle pageParam correctly
+    const baseUrl = queryKey[0];
+    const url = baseUrl + pageParam;
+    const { data } = await axios.get(API_BASE_URL + url);
     return data;
   } catch (error) {
     throw new Error(error);
   }
 };
+
 export const useInfiniteApi = (endpoint) => {
   return useInfiniteQuery({
     queryKey: [endpoint],
     queryFn: fetchInfiniteData,
     initialPageParam: 1,
     retry: 0,
-    getNextPageParam: (lastpage) => {
-      if (lastpage.data.pageInfo.hasNextPage) {
-        return lastpage.data.pageInfo.currentPage + 1;
-      } else {
-        return undefined;
+    getNextPageParam: (lastPage) => {
+      // Check the new pageInfo structure
+      if (lastPage.pageInfo?.hasNextPage) {
+        return lastPage.pageInfo.currentPage + 1;
       }
+      return undefined;
     },
   });
 };

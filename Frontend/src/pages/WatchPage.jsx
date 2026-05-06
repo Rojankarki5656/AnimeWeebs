@@ -82,7 +82,6 @@ const WatchPage = () => {
   const ep = normalizeEpisodeParam(searchParams.get("ep"));
 
   const { data, isError, isLoading } = useApi(`/episodes/${id}`);
-  console.log("Episodes API Response:", data);
 
   const episodes = useMemo(() => data?.data || [], [data]);
 
