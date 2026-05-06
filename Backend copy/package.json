@@ -18,7 +18,9 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix && prettier . --write",
     "dev": "bun --hot index.js",
-    "start": "bun index.js",
+    "start": "node index.js",
+    "vercel-start": "node index.js",
+    "build": "npm install",
     "test": "vitest"
   },
   "dependencies": {
@@ -42,5 +44,8 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
     "prettier": "^3.7.4"
+  },
+  "engines": {
+    "node": ">=18.x"
   }
 }
