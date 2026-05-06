@@ -25,7 +25,7 @@ const updatesSchema = createRoute({
   path: '/recentlyupdates',
   request: {
     query: z.object({
-      page: z.string().optional().openapi({ description: 'Page number', example: '1' }),
+      page: z.string().optional(),
     }),
   },
   responses: {

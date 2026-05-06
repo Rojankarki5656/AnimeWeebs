@@ -1,6 +1,21 @@
 import config from '@/config/config';
 import { NotFoundError, validationError } from '@/utils/errors.js';
 import streamExtract from './stream.extract.js';
+import connectRedis from '@/utils/connectRedis';
+
+const parseCached = (cached) => {
+  if (!cached) return null;
+  if (typeof cached === "object" && cached !== null) {
+    return cached;
+  }
+  if (typeof cached === "string") {
+    const trimmed = cached.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      return JSON.parse(trimmed);
+    }
+  }
+  throw new Error("Invalid cache format");
+};
 
 export default async function streamHandler(c) {
   const { link_id } = c.req.valid('query');
@@ -9,15 +24,53 @@ export default async function streamHandler(c) {
     throw new validationError('link_id is required');
   }
   
-  const response = await resolveSource(link_id);
-  
-  if (!response || response.error) {
-    throw new NotFoundError('Failed to resolve source');
+  const { exist, redis } = await connectRedis();
+  const cacheKey = `stream:${link_id}`;
+
+  const fetchFreshSource = async () => {
+    const response = await resolveSource(link_id);
+    if (!response || response.error) {
+      throw new NotFoundError('Failed to resolve source');
+    }
+    return response;
+  };
+
+  if (!exist) {
+    const response = await fetchFreshSource();
+    return streamExtract(response);
+  }
+
+  // Try cache
+  try {
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+      console.log("Cache hit for stream source:", link_id);
+      const response = parseCached(cached);
+      return streamExtract(response);
+    }
+  } catch (err) {
+    console.error("Redis read error:", err.message);
+    try {
+      await redis.del(cacheKey);
+    } catch (delErr) {
+      console.error("Failed to delete corrupted cache:", delErr.message);
+    }
+  }
+
+  const response = await fetchFreshSource();
+
+  try {
+    await redis.set(cacheKey, JSON.stringify(response), {
+      ex: 60 * 60 * 24,
+    });
+  } catch (err) {
+    console.error("Redis write error:", err.message);
   }
 
   return streamExtract(response);
 }
 
+// Rest of your resolveSource, encodeToken, decodeKai, decodeMega functions remain the same
 export async function resolveSource(linkId) {
   const ENCDEC_URL = 'https://enc-dec.app/api/enc-kai';
   const DEC_KAI_URL = 'https://enc-dec.app/api/dec-kai';
@@ -36,13 +89,11 @@ export async function resolveSource(linkId) {
   };
   
   try {
-    // 1. Encode the link_id
     const encoded = await encodeToken(linkId, ENCDEC_URL);
     if (!encoded) {
       return { error: 'Token encryption failed' };
     }
     
-    // 2. Fetch from /ajax/links/view
     const linksViewUrl = `${config.baseurl}/ajax/links/view?id=${linkId}&_=${encoded}`;
     const response = await fetch(linksViewUrl, {
       method: 'GET',
@@ -60,15 +111,12 @@ export async function resolveSource(linkId) {
       return { error: 'No encrypted result found' };
     }
     
-    // 3. Decrypt with decode_kai
     const embedData = await decodeKai(encryptedResult, DEC_KAI_URL);
     if (!embedData || !embedData.url) {
       return { error: 'Embed decryption failed' };
     }
     
     const embedUrl = embedData.url;
-    
-    // 4. Extract video_id and fetch media
     const videoId = embedUrl.replace(/\/$/, '').split('/').pop();
     const embedBase = embedUrl.includes('/e/') 
       ? embedUrl.split('/e/')[0]
@@ -91,7 +139,6 @@ export async function resolveSource(linkId) {
       return { error: 'No encrypted media found' };
     }
     
-    // 5. Decrypt with decode_mega
     const finalData = await decodeMega(encryptedMedia, DEC_MEGA_URL, HEADERS['User-Agent']);
     if (!finalData) {
       return { error: 'Media decryption failed' };
@@ -110,7 +157,6 @@ export async function resolveSource(linkId) {
   }
 }
 
-// Helper function to encode token
 async function encodeToken(text, encdecUrl) {
   try {
     const response = await fetch(`${encdecUrl}?text=${encodeURIComponent(text)}`, {
@@ -129,7 +175,6 @@ async function encodeToken(text, encdecUrl) {
   }
 }
 
-// Helper function to decode Kai
 async function decodeKai(encryptedText, decKaiUrl) {
   try {
     const response = await fetch(decKaiUrl, {
@@ -149,7 +194,6 @@ async function decodeKai(encryptedText, decKaiUrl) {
   }
 }
 
-// Helper function to decode Mega
 async function decodeMega(encryptedText, decMegaUrl, userAgent) {
   try {
     const response = await fetch(decMegaUrl, {

@@ -17,6 +17,7 @@ export default async function animeInfo(c) {
   } else {
     const detail = await redis.get(id);
     if (detail) {
+      console.log('Cache hit for anime info:', id);
       return detail;
     }
 

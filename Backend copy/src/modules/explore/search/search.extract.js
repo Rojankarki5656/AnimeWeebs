@@ -9,21 +9,25 @@ export default function extractSearch(html) {
   $('.aitem').each((i, el) => {
     const $item = $(el);
 
-    const href = $item.attr('href') || '';
+    // Get the poster link and slug
+    const posterLink = $item.find('.poster');
+    const href = posterLink.attr('href') || '';
     const slugMatch = href.match(/\/watch\/([^?#]+)/);
     const slug = slugMatch ? slugMatch[1] : '';
 
-    const posterDiv = $item.find('.poster div img');
-    const poster = posterDiv.attr('src') || '';
+    // Poster image
+    const posterImg = $item.find('.poster div img');
+    const poster = posterImg.attr('data-src') || posterImg.attr('src') || '';
 
-    const titleEl = $item.find('.detail .title');
+    // Title (direct .title, not inside .detail)
+    const titleEl = $item.find('.title');
     const title = titleEl.text().trim();
     const japaneseTitle = titleEl.attr('data-jp') || '';
 
     // Extract info spans
-    const subSpan = $item.find('.detail .info .sub');
+    const subSpan = $item.find('.info .sub');
     const subEpisodes = subSpan.length ? subSpan.text().trim() : '0';
-    const dubSpan = $item.find('.detail .info .dub');
+    const dubSpan = $item.find('.info .dub');
     const dubEpisodes = dubSpan.length ? dubSpan.text().trim() : '0';
 
     let totalEpisodes = '';
@@ -31,7 +35,8 @@ export default function extractSearch(html) {
     let type = '';
     let rating = '';
 
-    $item.find('.detail .info span').each((idx, span) => {
+    // Loop through all spans inside .info
+    $item.find('.info span').each((idx, span) => {
       const $span = $(span);
       const text = $span.text().trim();
       const hasBold = $span.find('b').length > 0;

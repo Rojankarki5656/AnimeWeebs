@@ -21,12 +21,14 @@ import * as monthlySchedule from "../modules/schedule/monthlySchedule/index";
 import * as nextEpSchedule from "../modules/schedule/nextEpSchedule/index";
 import * as meta from "../modules/meta/index";
 import * as recentlyupdates from "../modules/recently-updates/index";
-import * as newReleases from '../modules/new-releases/index';
+import * as newReleases from "../modules/new-releases/index";
 import withTryCatch from "@/utils/withTryCatch";
 
 const router = createRouter();
 
 const routes = [
+  recentlyupdates,
+  newReleases,
   home,
   spotlight,
   topTen,
@@ -47,8 +49,6 @@ const routes = [
   nextEpSchedule,
   meta,
   explore,
-  recentlyupdates,
-  newReleases,
 ];
 
 routes.forEach((route) => {

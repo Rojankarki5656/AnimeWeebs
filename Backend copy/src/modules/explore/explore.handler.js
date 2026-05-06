@@ -9,8 +9,6 @@ export default async function exploreHandler(c) {
 
   const endpoint = createEndpoint(query, page);
 
-  console.log(endpoint);
-
   const result = await axiosInstance(endpoint);
 
   if (!result.success) {
