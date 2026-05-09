@@ -29,6 +29,9 @@
     "crypto-js": "^4.2.0",
     "hono": "^4.11.4",
     "hono-rate-limiter": "^0.4.2",
+    "playwright": "^1.59.1",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "zod": "^4.3.5"
   },
   "devDependencies": {

@@ -30,7 +30,7 @@ export default async function streamHandler(c) {
   const fetchFreshSource = async () => {
     const response = await resolveSource(link_id);
     if (!response || response.error) {
-      throw new NotFoundError('Failed to resolve source');
+      throw new NotFoundError('Failed to resolve source', response?.error || 'Unknown error');
     }
     return response;
   };
@@ -68,6 +68,24 @@ export default async function streamHandler(c) {
   }
 
   return streamExtract(response);
+}
+
+async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      const response = await fetch(url, options);
+      if (response.status === 403 && i < retries - 1) {
+        console.log(`Got 403, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        delay *= 2; // Exponential backoff
+        continue;
+      }
+      return response;
+    } catch (error) {
+      if (i === retries - 1) throw error;
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
 }
 
 // Rest of your resolveSource, encodeToken, decodeKai, decodeMega functions remain the same
@@ -127,6 +145,8 @@ export async function resolveSource(linkId) {
       method: 'GET',
       headers: HEADERS,
     });
+
+
     
     if (!mediaResponse.ok) {
       return { error: `Failed to fetch media: ${mediaResponse.status}` };
