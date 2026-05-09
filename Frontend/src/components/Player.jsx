@@ -27,6 +27,57 @@ import {
 } from "lucide-react";
 import { API_BASE_URL, useApi } from "../services/useApi";
 
+// ----------------------------------------------------------------------
+//  Client‑side decryption helper (bypasses Cloudflare)
+// ----------------------------------------------------------------------
+async function decryptMedia(mediaUrl, userAgent) {
+  const DEC_MEGA_URL = "https://enc-dec.app/api/dec-mega";
+
+  // 1. Fetch the encrypted media data from the provided URL
+  const mediaResponse = await fetch(mediaUrl, {
+    method: "GET",
+    headers: {
+      "User-Agent": userAgent || navigator.userAgent,
+      Accept: "application/json",
+    },
+    credentials: "include", // send cookies if needed
+  });
+
+  if (!mediaResponse.ok) {
+    throw new Error(`Failed to fetch media: ${mediaResponse.status}`);
+  }
+
+  const mediaData = await mediaResponse.json();
+  const encryptedMedia = mediaData.result || "";
+
+  if (!encryptedMedia) {
+    throw new Error("No encrypted media found");
+  }
+
+  // 2. Decrypt the result using the external API
+  const decryptResponse = await fetch(DEC_MEGA_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "User-Agent": userAgent || navigator.userAgent,
+    },
+    body: JSON.stringify({
+      text: encryptedMedia,
+      agent: userAgent || navigator.userAgent,
+    }),
+  });
+
+  const decryptData = await decryptResponse.json();
+
+  if (decryptData.status === 200 && decryptData.result) {
+    return decryptData.result;
+  }
+  throw new Error("Media decryption failed");
+}
+
+// ----------------------------------------------------------------------
+//  Main Player Component
+// ----------------------------------------------------------------------
 const Player = ({
   token,
   episodeId,
@@ -47,7 +98,7 @@ const Player = ({
   const [isStreamLoading, setIsStreamLoading] = useState(false);
   const [error, setError] = useState(null);
   const requestIdRef = useRef(0);
-  
+
   // Custom video player states
   const videoRef = useRef(null);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -79,7 +130,10 @@ const Player = ({
 
   const normalizeCategoryKey = (value = "") => {
     const key = String(value).toLowerCase().trim();
-    if (["subbed", "subtitle", "subtitles", "soft sub", "soft-sub"].includes(key)) return "sub";
+    if (
+      ["subbed", "subtitle", "subtitles", "soft sub", "soft-sub"].includes(key)
+    )
+      return "sub";
     if (["softsub", "soft-subbed"].includes(key)) return "softsub";
     if (["dubbed", "audio"].includes(key)) return "dub";
     return key;
@@ -132,16 +186,25 @@ const Player = ({
       setSelectedServer("");
       return;
     }
-    if (!selectedServer || !availableServers.some((s) => s.link_id === selectedServer)) {
+    if (
+      !selectedServer ||
+      !availableServers.some((s) => s.link_id === selectedServer)
+    ) {
       setSelectedServer(availableServers[0].link_id);
     }
   }, [availableServers, selectedServer]);
 
   const selectedServerData = useMemo(
-    () => availableServers.find((server) => server.link_id === selectedServer) ?? null,
+    () =>
+      availableServers.find((server) => server.link_id === selectedServer) ??
+      null,
     [availableServers, selectedServer]
   );
 
+  // -------------------------------------------------------------------
+  //  Updated stream fetching: backend returns media_url (or embed_url)
+  //  and frontend performs the decryption.
+  // -------------------------------------------------------------------
   useEffect(() => {
     if (!selectedServerData?.link_id) {
       setStreamResponse(null);
@@ -157,6 +220,7 @@ const Player = ({
       setIsStreamLoading(true);
       setError(null);
       try {
+        // 1. Get the basic stream info (embed_url and/or media_url)
         const res = await fetch(
           `${API_BASE_URL}/stream?link_id=${encodeURIComponent(selectedServerData.link_id)}`,
           { signal: controller.signal }
@@ -164,7 +228,40 @@ const Player = ({
         if (!res.ok) throw new Error(`Failed to load stream (${res.status})`);
         const json = await res.json();
         if (requestId !== requestIdRef.current) return;
-        setStreamResponse(json?.data ?? json);
+
+        const streamData = json?.data ?? json;
+
+        // 2. If we have a media_url, decrypt it in the browser (bypass Cloudflare)
+        if (streamData.media_url) {
+          try {
+            const decryptedData = await decryptMedia(
+              streamData.media_url,
+              navigator.userAgent
+            );
+            const finalStreamData = {
+              ...streamData,
+              sources: decryptedData.sources || [],
+              tracks: decryptedData.tracks || [],
+              download: decryptedData.download || "",
+            };
+            if (requestId === requestIdRef.current) {
+              setStreamResponse(finalStreamData);
+            }
+          } catch (decryptErr) {
+            console.error("Decryption failed:", decryptErr);
+            setError("Failed to decrypt video source. Try another server.");
+            setStreamResponse(null);
+          }
+        }
+        // 3. Otherwise use embed_url (iframe) directly
+        else if (streamData.embed_url) {
+          if (requestId === requestIdRef.current) {
+            setStreamResponse(streamData);
+          }
+        } else {
+          setError("No valid stream source found");
+          setStreamResponse(null);
+        }
       } catch (err) {
         if (requestId !== requestIdRef.current) return;
         if (err.name === "AbortError") {
@@ -177,6 +274,7 @@ const Player = ({
         if (requestId === requestIdRef.current) setIsStreamLoading(false);
       }
     };
+
     loadStream();
     return () => {
       controller.abort();
@@ -185,7 +283,11 @@ const Player = ({
   }, [selectedServerData?.link_id]);
 
   const streamData = streamResponse;
-  const embedUrl = streamData?.embed_url || streamData?.embedUrl || streamData?.sources?.file || "";
+  const embedUrl =
+    streamData?.embed_url ||
+    streamData?.embedUrl ||
+    streamData?.sources?.file ||
+    "";
   const videoSource = streamData?.sources?.[0]?.file || "";
   const streamUrl = embedUrl || videoSource || "";
   const isEmbedStream = Boolean(embedUrl && !videoSource);
@@ -196,7 +298,9 @@ const Player = ({
     else setError(null);
   }, [isServersError]);
 
-  // Video controls
+  // -------------------------------------------------------------------
+  //  Video controls (unchanged)
+  // -------------------------------------------------------------------
   const togglePlay = () => {
     if (videoRef.current) {
       if (isPlaying) videoRef.current.pause();
@@ -205,7 +309,8 @@ const Player = ({
     }
   };
 
-  const handleTimeUpdate = () => videoRef.current && setCurrentTime(videoRef.current.currentTime);
+  const handleTimeUpdate = () =>
+    videoRef.current && setCurrentTime(videoRef.current.currentTime);
   const handleLoadedMetadata = () => {
     if (videoRef.current) {
       setDuration(videoRef.current.duration);
@@ -250,7 +355,9 @@ const Player = ({
     const h = Math.floor(t / 3600);
     const m = Math.floor((t % 3600) / 60);
     const s = Math.floor(t % 60);
-    return h > 0 ? `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}` : `${m}:${s.toString().padStart(2, "0")}`;
+    return h > 0
+      ? `${h}:${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}`
+      : `${m}:${s.toString().padStart(2, "0")}`;
   };
   const handleVideoEnd = () => {
     setIsPlaying(false);
@@ -268,11 +375,13 @@ const Player = ({
     }, 3000);
   };
   useEffect(() => {
-    return () => controlsTimeoutRef.current && clearTimeout(controlsTimeoutRef.current);
+    return () =>
+      controlsTimeoutRef.current && clearTimeout(controlsTimeoutRef.current);
   }, []);
 
   const handleIframeLoad = () => setError(null);
-  const handleIframeError = () => setError("Iframe failed. Try another server.");
+  const handleIframeError = () =>
+    setError("Iframe failed. Try another server.");
   const changeCategory = (newType) => {
     const norm = normalizeCategoryKey(newType);
     if (norm !== category) {
@@ -337,29 +446,38 @@ const Player = ({
     { id: 6, name: "Season 3", episodes: 12 },
   ];
 
-  // Helper to get anime title from parent (passed via context or we assume currentEp has it)
-  const animeTitle = "Anime Title"; // Ideally receive as prop; for SEO we use fallback
+  const animeTitle = "Anime Title"; // Ideally receive as prop
   const episodeNumber = currentEp?.episodeNumber || "?";
 
   return (
     <>
       {/* Hidden SEO & Schema */}
       <div className="sr-only" aria-hidden="true">
-        <h2>Video Player for {animeTitle} Episode {episodeNumber}</h2>
-        <p>Watch {animeTitle} Episode {episodeNumber} online free in HD. No ads, fast streaming, multiple servers.</p>
+        <h2>
+          Video Player for {animeTitle} Episode {episodeNumber}
+        </h2>
+        <p>
+          Watch {animeTitle} Episode {episodeNumber} online free in HD. No ads,
+          fast streaming, multiple servers.
+        </p>
       </div>
       <script type="application/ld+json">
         {JSON.stringify({
           "@context": "https://schema.org",
           "@type": "VideoObject",
-          "name": `${animeTitle} Episode ${episodeNumber}`,
-          "description": `Watch ${animeTitle} Episode ${episodeNumber} free on AnimeWeebs.`,
-          "thumbnailUrl": currentEp?.poster || "",
-          "uploadDate": currentEp?.aired || new Date().toISOString(),
-          "embedUrl": window.location.href,
-          "contentUrl": videoSource || embedUrl,
-          "duration": currentEp?.duration || "",
-          "offers": { "@type": "Offer", price: "0", priceCurrency: "USD", availability: "https://schema.org/InStock" }
+          name: `${animeTitle} Episode ${episodeNumber}`,
+          description: `Watch ${animeTitle} Episode ${episodeNumber} free on AnimeWeebs.`,
+          thumbnailUrl: currentEp?.poster || "",
+          uploadDate: currentEp?.aired || new Date().toISOString(),
+          embedUrl: window.location.href,
+          contentUrl: videoSource || embedUrl,
+          duration: currentEp?.duration || "",
+          offers: {
+            "@type": "Offer",
+            price: "0",
+            priceCurrency: "USD",
+            availability: "https://schema.org/InStock",
+          },
         })}
       </script>
 
@@ -375,7 +493,9 @@ const Player = ({
             <div className="text-center">
               <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
               <p className="text-gray-400">Loading video...</p>
-              <p className="text-xs text-gray-500 mt-2">This may take a moment</p>
+              <p className="text-xs text-gray-500 mt-2">
+                This may take a moment
+              </p>
             </div>
           </div>
         )}
@@ -468,16 +588,18 @@ const Player = ({
               {/* Controls Row – responsive layout */}
               <div className="flex flex-wrap items-center justify-between gap-2 sm:gap-3">
                 <div className="flex items-center gap-1 sm:gap-3 flex-wrap">
-                  {/* Play/Pause */}
                   <button
                     onClick={togglePlay}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
                     aria-label={isPlaying ? "Pause" : "Play"}
                   >
-                    {isPlaying ? <Pause className="w-5 h-5 sm:w-6 sm:h-6" /> : <Play className="w-5 h-5 sm:w-6 sm:h-6" />}
+                    {isPlaying ? (
+                      <Pause className="w-5 h-5 sm:w-6 sm:h-6" />
+                    ) : (
+                      <Play className="w-5 h-5 sm:w-6 sm:h-6" />
+                    )}
                   </button>
 
-                  {/* Skip Back 15s */}
                   <button
                     onClick={() => skip(-15)}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -489,7 +611,6 @@ const Player = ({
                     </div>
                   </button>
 
-                  {/* Skip Forward 15s */}
                   <button
                     onClick={() => skip(15)}
                     className="p-2 hover:bg-white/10 rounded-lg transition-colors"
@@ -501,7 +622,6 @@ const Player = ({
                     </div>
                   </button>
 
-                  {/* Skip Intro (85s) – hide on very small screens */}
                   {autoSkipIntro && !isMobile && (
                     <button
                       onClick={() => skip(85)}
@@ -510,12 +630,13 @@ const Player = ({
                     >
                       <div className="flex items-center gap-1">
                         <Zap className="w-4 h-4 sm:w-5 sm:h-5" />
-                        <span className="text-xs sm:text-sm font-medium">85</span>
+                        <span className="text-xs sm:text-sm font-medium">
+                          85
+                        </span>
                       </div>
                     </button>
                   )}
 
-                  {/* Volume control – hide on mobile (can be accessed via keyboard) */}
                   {!isMobile && (
                     <div className="flex items-center gap-1 sm:gap-2 ml-1 sm:ml-2">
                       <button
@@ -523,7 +644,11 @@ const Player = ({
                         className="p-2 hover:bg-white/10 rounded-lg"
                         aria-label={isMuted ? "Unmute" : "Mute"}
                       >
-                        {isMuted || volume === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
+                        {isMuted || volume === 0 ? (
+                          <VolumeX className="w-5 h-5" />
+                        ) : (
+                          <Volume2 className="w-5 h-5" />
+                        )}
                       </button>
                       <input
                         type="range"
@@ -540,12 +665,10 @@ const Player = ({
                 </div>
 
                 <div className="flex items-center gap-1 sm:gap-2">
-                  {/* Time display (always visible) */}
                   <span className="text-xs sm:text-sm text-gray-300 hidden sm:inline">
                     {formatTime(currentTime)} / {formatTime(duration)}
                   </span>
 
-                  {/* Playback speed – only on larger screens */}
                   {!isMobile && (
                     <div className="relative">
                       <button
@@ -562,7 +685,11 @@ const Player = ({
                             <button
                               key={rate}
                               onClick={() => changePlaybackRate(rate)}
-                              className={`block w-full text-left px-3 py-2 text-xs hover:bg-gray-700 ${playbackRate === rate ? "text-primary bg-gray-700" : "text-white"}`}
+                              className={`block w-full text-left px-3 py-2 text-xs hover:bg-gray-700 ${
+                                playbackRate === rate
+                                  ? "text-primary bg-gray-700"
+                                  : "text-white"
+                              }`}
                             >
                               {rate}x
                             </button>
@@ -572,7 +699,6 @@ const Player = ({
                     </div>
                   )}
 
-                  {/* Fullscreen */}
                   <button
                     onClick={toggleFullscreen}
                     className="p-2 hover:bg-white/10 rounded-lg"
@@ -610,7 +736,7 @@ const Player = ({
         )}
       </div>
 
-      {/* Bottom Controls Section – already mostly responsive, just minor tweaks */}
+      {/* Bottom Controls Section */}
       <div className="rounded-xl border border-gray-800 mt-4">
         <div className="p-4 border-b border-gray-800">
           <div className="flex flex-wrap items-center justify-between gap-4">
@@ -618,11 +744,15 @@ const Player = ({
               <button
                 onClick={() => setExpanded(!expanded)}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg transition-all ${
-                  expanded ? "bg-primary text-black" : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  expanded
+                    ? "bg-primary text-black"
+                    : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
                 <Expand className="w-4 h-4" />
-                <span className="text-sm font-medium">{expanded ? "Collapse" : "Expand"}</span>
+                <span className="text-sm font-medium">
+                  {expanded ? "Collapse" : "Expand"}
+                </span>
               </button>
 
               <button
@@ -633,8 +763,14 @@ const Player = ({
                     : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                 }`}
               >
-                {lightMode ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-                <span className="text-sm font-medium">Light {lightMode ? "On" : "Off"}</span>
+                {lightMode ? (
+                  <Sun className="w-4 h-4" />
+                ) : (
+                  <Moon className="w-4 h-4" />
+                )}
+                <span className="text-sm font-medium">
+                  Light {lightMode ? "On" : "Off"}
+                </span>
               </button>
 
               <button
@@ -646,7 +782,9 @@ const Player = ({
                 }`}
               >
                 <PlayCircle className="w-4 h-4" />
-                <span className="text-sm font-medium">Auto Play {autoPlay ? "On" : "Off"}</span>
+                <span className="text-sm font-medium">
+                  Auto Play {autoPlay ? "On" : "Off"}
+                </span>
               </button>
 
               <button
@@ -658,7 +796,9 @@ const Player = ({
                 }`}
               >
                 <SkipForward className="w-4 h-4" />
-                <span className="text-sm font-medium">Auto Next {autoNext ? "On" : "Off"}</span>
+                <span className="text-sm font-medium">
+                  Auto Next {autoNext ? "On" : "Off"}
+                </span>
               </button>
 
               <button
@@ -670,23 +810,30 @@ const Player = ({
                 }`}
               >
                 <Zap className="w-4 h-4" />
-                <span className="text-sm font-medium">Auto Skip {autoSkipIntro ? "On" : "Off"}</span>
+                <span className="text-sm font-medium">
+                  Auto Skip {autoSkipIntro ? "On" : "Off"}
+                </span>
               </button>
             </div>
 
             <div className="flex flex-col items-end gap-3">
               <div className="flex flex-wrap justify-end gap-2">
-                {(availableCategories.length ? availableCategories : ["sub", "softsub", "dub"]).map((type) => (
+                {(availableCategories.length
+                  ? availableCategories
+                  : ["sub", "softsub", "dub"]
+                ).map((type) => (
                   <button
                     key={type}
                     onClick={() => changeCategory(type)}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
-                      normalizeCategoryKey(category) === normalizeCategoryKey(type)
+                      normalizeCategoryKey(category) ===
+                      normalizeCategoryKey(type)
                         ? "bg-blue-500 text-white font-bold"
                         : "bg-gray-800 text-gray-300 hover:bg-gray-700"
                     }`}
                   >
-                    {CATEGORY_LABELS[normalizeCategoryKey(type)] || type.toUpperCase()}
+                    {CATEGORY_LABELS[normalizeCategoryKey(type)] ||
+                      type.toUpperCase()}
                   </button>
                 ))}
               </div>
@@ -727,7 +874,9 @@ const Player = ({
                   </span>
                 )}
               </h3>
-              {currentEp?.title && <p className="text-gray-300 mt-1">{currentEp.title}</p>}
+              {currentEp?.title && (
+                <p className="text-gray-300 mt-1">{currentEp.title}</p>
+              )}
             </div>
 
             <div className="flex gap-3">
@@ -760,7 +909,8 @@ const Player = ({
             <div className="flex items-start gap-2">
               <AlertCircle className="w-5 h-5 text-blue-400 flex-shrink-0 mt-0.5" />
               <p className="text-sm text-gray-300">
-                🎮 Video controls: Tap player to play/pause | ←/→ to skip 15s | ↑/↓ for volume | F for fullscreen
+                🎮 Video controls: Tap player to play/pause | ←/→ to skip 15s |
+                ↑/↓ for volume | F for fullscreen
               </p>
             </div>
           </div>
@@ -771,8 +921,14 @@ const Player = ({
               className="flex items-center justify-between w-full mb-4"
             >
               <div className="flex items-center gap-2">
-                <span className="text-lg font-bold text-white">Watch more seasons of this anime</span>
-                {showSeasons ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+                <span className="text-lg font-bold text-white">
+                  Watch more seasons of this anime
+                </span>
+                {showSeasons ? (
+                  <ChevronUp className="w-5 h-5 text-gray-400" />
+                ) : (
+                  <ChevronDown className="w-5 h-5 text-gray-400" />
+                )}
               </div>
             </button>
 
@@ -788,10 +944,16 @@ const Player = ({
                     }`}
                   >
                     <div className="flex flex-col items-center text-center">
-                      <span className={`text-sm font-medium ${season.current ? "text-primary" : "text-white"}`}>
+                      <span
+                        className={`text-sm font-medium ${
+                          season.current ? "text-primary" : "text-white"
+                        }`}
+                      >
                         {season.name}
                       </span>
-                      <span className="text-xs text-gray-400 mt-1">{season.episodes} episodes</span>
+                      <span className="text-xs text-gray-400 mt-1">
+                        {season.episodes} episodes
+                      </span>
                       {season.current && (
                         <div className="mt-2">
                           <CheckCircle className="w-4 h-4 text-primary mx-auto" />

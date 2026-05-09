@@ -1,3 +1,4 @@
+// stream.handler.js - Modified version
 import config from '@/config/config';
 import { NotFoundError, validationError } from '@/utils/errors.js';
 import streamExtract from './stream.extract.js';
@@ -77,7 +78,7 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
       if (response.status === 403 && i < retries - 1) {
         console.log(`Got 403, retrying in ${delay}ms... (attempt ${i + 1}/${retries})`);
         await new Promise(resolve => setTimeout(resolve, delay));
-        delay *= 2; // Exponential backoff
+        delay *= 2;
         continue;
       }
       return response;
@@ -88,22 +89,15 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
   }
 }
 
-// Rest of your resolveSource, encodeToken, decodeKai, decodeMega functions remain the same
 export async function resolveSource(linkId) {
   const ENCDEC_URL = 'https://enc-dec.app/api/enc-kai';
   const DEC_KAI_URL = 'https://enc-dec.app/api/dec-kai';
-  const DEC_MEGA_URL = 'https://enc-dec.app/api/dec-mega';
   
   const AJAX_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
     'Accept': 'application/json',
     'X-Requested-With': 'XMLHttpRequest',
     'Referer': `${config.baseurl}/`,
-  };
-  
-  const HEADERS = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-    'Accept': 'application/json',
   };
   
   try {
@@ -141,35 +135,16 @@ export async function resolveSource(linkId) {
       : embedUrl.split('/').slice(0, -1).join('/');
     
     const mediaUrl = `${embedBase}/media/${videoId}`;
-    const mediaResponse = await fetch(mediaUrl, {
-      method: 'GET',
-      headers: HEADERS,
-    });
-
-
     
-    if (!mediaResponse.ok) {
-      return { error: `Failed to fetch media: ${mediaResponse.status}` };
-    }
-    
-    const mediaData = await mediaResponse.json();
-    const encryptedMedia = mediaData.result || '';
-    
-    if (!encryptedMedia) {
-      return { error: 'No encrypted media found' };
-    }
-    
-    const finalData = await decodeMega(encryptedMedia, DEC_MEGA_URL, HEADERS['User-Agent']);
-    if (!finalData) {
-      return { error: 'Media decryption failed' };
-    }
-    
+    // Instead of fetching media, return the media URL for frontend to handle
     return {
       embed_url: embedUrl,
+      media_url: mediaUrl, // Send this to frontend
+      encrypted_media: null, // Not needed anymore
       skip: embedData.skip || {},
-      sources: finalData.sources || [],
-      tracks: finalData.tracks || [],
-      download: finalData.download || '',
+      sources: [], // Will be populated by frontend
+      tracks: [], // Will be populated by frontend
+      download: '',
     };
   } catch (error) {
     console.error('Resolve source error:', error.message);
@@ -210,28 +185,6 @@ async function decodeKai(encryptedText, decKaiUrl) {
     return data.status === 200 ? data.result : null;
   } catch (error) {
     console.error('Decode Kai error:', error.message);
-    return null;
-  }
-}
-
-async function decodeMega(encryptedText, decMegaUrl, userAgent) {
-  try {
-    const response = await fetch(decMegaUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      },
-      body: JSON.stringify({ 
-        text: encryptedText, 
-        agent: userAgent 
-      }),
-    });
-    
-    const data = await response.json();
-    return data.status === 200 ? data.result : null;
-  } catch (error) {
-    console.error('Decode Mega error:', error.message);
     return null;
   }
 }
