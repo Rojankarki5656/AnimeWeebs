@@ -4,6 +4,7 @@ import Loader from "../components/Loader";
 import Player from "../components/Player";
 import Episodes from "../layouts/Episodes";
 import { useApi } from "../services/useApi";
+import { useApi3 } from "../services/useApi3";
 import PageNotFound from "./PageNotFound";
 import {
   Grid3x3,
@@ -70,6 +71,9 @@ const parseWatchSlug = (rawSlug = "") => {
   };
 };
 
+
+
+
 const WatchPage = () => {
   const { slug } = useParams();
   const { animeId: id, animeTitle: parsedAnimeTitle } = parseWatchSlug(
@@ -82,6 +86,12 @@ const WatchPage = () => {
   const ep = normalizeEpisodeParam(searchParams.get("ep"));
 
   const { data, isError, isLoading } = useApi(`/episodes/${id}`);
+
+
+  const searchQuery = `/api/search?q=MAO`;
+  const { data: searchData, isLoading: searchLoading, isError: searchError } = useApi3(searchQuery);
+
+  console.log("Search Data:", searchData, "Loading:", searchLoading, "Error:", searchError);
 
   const episodes = useMemo(() => data?.data || [], [data]);
 

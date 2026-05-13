@@ -71,7 +71,7 @@ const MainLayout = ({ title, data, endpoint }) => {
               <div className="relative aspect-[2/3] overflow-hidden rounded-t-2xl">
                 {/* Poster Image – SEO‑rich alt text */}
                 <img
-                  src={item.poster}
+                  src={item.poster || item.image}
                   alt={`${item.title} – watch online free in HD on AnimeWeebs`}
                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                   width="200"
@@ -105,7 +105,7 @@ const MainLayout = ({ title, data, endpoint }) => {
                     )}
                     {item.episodes.eps !== undefined && (
                       <span className="text-xs px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 border border-green-500/20">
-                        EPS {item.episodes.eps}
+                        EPS {item.episodes.eps || item.episode}
                       </span>
                     )}
                   </div>

@@ -15,6 +15,7 @@ import Footer from "../components/Footer";
 
 import { genres } from "../utils/genres";
 import { Helmet } from "react-helmet-async";
+import { useApi3 } from "../services/useApi3";
 
 const Home = () => {
   const { data, isLoading, error, isError } = useApi("/home");

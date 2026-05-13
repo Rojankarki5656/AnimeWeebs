@@ -1,55 +1,30 @@
 import { createRoute, z } from '@hono/zod-openapi';
-import { AnimeWithEpisodesSchema, BasicAnimeSchema } from '../globalSchema/schema';
 
-const Item = z.any();
+const AnimeCardSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  poster: z.string().url().nullable(),
+  rank: z.number().optional(),
+  detailId: z.string().nullable().optional(),
+  episodes: z.object({
+    sub: z.number().optional(),
+    dub: z.number().optional(),
+    eps: z.number().optional(),
+  }).optional(),
+  type: z.string().optional(),
+  duration: z.string().optional(),
+  rating: z.number().optional(),
+  synopsis: z.string().optional(),
+});
 
-const schema = z.object({
+const homeResponseSchema = z.object({
   status: z.boolean(),
   data: z.object({
-    spotlight: z.array(
-      AnimeWithEpisodesSchema.extend({
-        rank: z.number(),
-        type: z.string(),
-        quality: z.string(),
-        duration: z.string(),
-        aired: z.string(),
-        synopsis: z.string(),
-      })
-    ),
-    trending: z.array(
-      BasicAnimeSchema.extend({
-        rank: z.number(),
-      })
-    ),
-    topAiring: z.array(
-      AnimeWithEpisodesSchema.extend({
-        type: z.string(),
-      })
-    ),
-    mostPopular: z.array(
-      AnimeWithEpisodesSchema.extend({
-        type: z.string(),
-      })
-    ),
-    mostFavorite: z.array(
-      AnimeWithEpisodesSchema.extend({
-        type: z.string(),
-      })
-    ),
-    latestCompleted: z.array(
-      AnimeWithEpisodesSchema.extend({
-        type: z.string(),
-      })
-    ),
-    latestEpisode: z.array(AnimeWithEpisodesSchema),
-    newAdded: z.array(AnimeWithEpisodesSchema),
-    topUpcoming: z.array(AnimeWithEpisodesSchema),
-    topTen: z.object({
-      today: z.array(AnimeWithEpisodesSchema),
-      week: z.array(AnimeWithEpisodesSchema),
-      month: z.array(AnimeWithEpisodesSchema),
-    }),
-    genres: z.array(Item),
+    trendingNow: z.array(AnimeCardSchema),
+    popularThisSeason: z.array(AnimeCardSchema),
+    upcomingNextSeason: z.array(AnimeCardSchema),
+    allTimePopular: z.array(AnimeCardSchema),
+    top100: z.array(AnimeCardSchema),
   }),
 });
 
@@ -60,12 +35,12 @@ const homeSchema = createRoute({
     200: {
       content: {
         'application/json': {
-          schema: schema,
+          schema: homeResponseSchema,
         },
       },
     },
   },
-  description: 'Retrieve The HomePage Data',
+  description: 'Retrieve HomePage Data from AniList search page',
 });
 
 export default homeSchema;

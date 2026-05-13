@@ -5,12 +5,12 @@ import infoExtract from "../info/info.extract";
 import episodesExtract from "./episodes.extract";
 import connectRedis from "@/utils/connectRedis";
 
-const ENCDEC_URL = "https://enc-dec.app/api/enc-kai";
+const ENCDEC_URL = "https://enc-dec.app/api/enc-reanime";
 
 async function encodeToken(text) {
   try {
     const response = await fetch(
-      `${ENCDEC_URL}?text=${encodeURIComponent(text)}`,
+      `${ENCDEC_URL}?encode=${encodeURIComponent(text)}`,
       {
         method: "GET",
         timeout: 15000,
