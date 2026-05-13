@@ -90,8 +90,8 @@ async function fetchWithRetry(url, options, retries = 3, delay = 1000) {
 }
 
 export async function resolveSource(linkId) {
-  const ENCDEC_URL = 'https://enc-dec.app/api/enc-kai';
-  const DEC_KAI_URL = 'https://enc-dec.app/api/dec-kai';
+  const ENCDEC_URL = 'https://enc-dec.app/api/enc-reanime';
+  const DEC_KAI_URL = 'https://enc-dec.app/api/dec-reanime';
   
   const AJAX_HEADERS = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',

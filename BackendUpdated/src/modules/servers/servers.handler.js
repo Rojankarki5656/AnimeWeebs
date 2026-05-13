@@ -65,7 +65,7 @@ export default async function (c) {
 }
 
 export async function getServers(epToken) {
-  const ENCDEC_URL = 'https://enc-dec.app/api/enc-kai';
+  const ENCDEC_URL = 'https://enc-dec.app/api/enc-reanime';
   
   let encoded;
   try {

@@ -6,11 +6,12 @@ import connectRedis from '@/utils/connectRedis';
 
 export default async function homeHandler() {
   const { exist, redis } = await connectRedis();
-  if (!exist) {
-    const result = await axiosInstance('/home');
+  if (exist) {
+    const result = await axiosInstance('search/anime');
     if (!result.success) {
       throw new validationError(result.message);
     }
+    console.log(result.data);
     const response = await homeExtract(result.data);
     return response;
   } else {
@@ -18,7 +19,7 @@ export default async function homeHandler() {
     if (homePageData) {
       return homePageData;
     }
-    const result = await axiosInstance('/home');
+    const result = await axiosInstance('search/anime');
     if (!result.success) {
       throw new validationError(result.message);
     }
