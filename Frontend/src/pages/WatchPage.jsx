@@ -91,8 +91,6 @@ const WatchPage = () => {
   const searchQuery = `/api/search?q=MAO`;
   const { data: searchData, isLoading: searchLoading, isError: searchError } = useApi3(searchQuery);
 
-  console.log("Search Data:", searchData, "Loading:", searchLoading, "Error:", searchError);
-
   const episodes = useMemo(() => data?.data || [], [data]);
 
   const updateParams = useCallback((newParam) => {
