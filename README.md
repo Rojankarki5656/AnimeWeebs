@@ -31,6 +31,69 @@ AnimeWeebs is a modern anime streaming and discovery web application that allows
 
 ---
 
+
+---
+
+## 📸 Preview
+
+### 🏠 Home
+![AnimeWeebs home page — hero carousel and trending rails](docs/home.png)
+---
+
+<div align="center">
+
+### 🎬 Watch anywhere. Talk about everything.
+
+<table>
+  <tr>
+    <td width="50%">
+      <img src="docs/screenshots/home.png" alt="Home" />
+      <p align="center"><sub><b>Cinematic home with trending rails</b></sub></p>
+    </td>
+    <td width="50%">
+      <img src="docs/screenshots/home2.png" alt="Watch page" />
+      <p align="center"><sub><b>Multi-server player with comments</b></sub></p>
+    </td>
+  </tr>
+</table>
+
+</div>
+
+---
+
+### 🎬 Watch Page
+![Watch page with player, episode sidebar, and comments](docs/watch-page.png)
+
+### 📖 Anime Detail
+![Anime detail page with poster, badges, and synopsis](docs/detail-page.png)
+
+### 🔍 Search & Filters
+![Search results with filters and active filter chips](docs/search.png)
+
+### 💬 Community
+![Community page with posts and voting](docs/community.png)
+
+### 🧵 Threaded Discussion
+![A single post with threaded comments](docs/post-page.png)
+
+### 👤 Profile
+![User profile with avatar, stats, and watchlist](docs/profile.png)
+
+### 🔖 Watchlist
+![Personal watchlist with status filters](docs/watchlist.png)
+
+### 🔐 Auth
+![Signup page with anime poster collage](docs/auth.png)
+
+### 📱 Mobile
+<div align="center">
+  <img src="docs/screenshots/mobile.png" alt="Mobile view" width="320" />
+</div>
+
+---
+
+
+
 ## Tech Stack
 
 * **Frontend:** React, Tailwind CSS
