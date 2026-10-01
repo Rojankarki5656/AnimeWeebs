@@ -34,7 +34,7 @@ AnimeWeebs is a modern anime streaming and discovery web application that allows
 
 ---
 
-## 📸 Preview
+## Preview
 
 ### 🏠 Home
 ![AnimeWeebs home page — hero carousel and trending rails](docs/home.png)
@@ -42,16 +42,16 @@ AnimeWeebs is a modern anime streaming and discovery web application that allows
 
 <div align="center">
 
-### 🎬 Watch anywhere. Talk about everything.
+### Watch anywhere. Talk about everything.
 
 <table>
   <tr>
     <td width="50%">
-      <img src="docs/screenshots/home.png" alt="Home" />
+      <img src="docs/home.png" alt="Home" />
       <p align="center"><sub><b>Cinematic home with trending rails</b></sub></p>
     </td>
     <td width="50%">
-      <img src="docs/screenshots/home2.png" alt="Watch page" />
+      <img src="docs/home2.png" alt="Watch page" />
       <p align="center"><sub><b>Multi-server player with comments</b></sub></p>
     </td>
   </tr>
@@ -61,31 +61,31 @@ AnimeWeebs is a modern anime streaming and discovery web application that allows
 
 ---
 
-### 🎬 Watch Page
+### Watch Page
 ![Watch page with player, episode sidebar, and comments](docs/watch-page.png)
 
-### 📖 Anime Detail
+### Anime Detail
 ![Anime detail page with poster, badges, and synopsis](docs/detail-page.png)
 
-### 🔍 Search & Filters
+### Search & Filters
 ![Search results with filters and active filter chips](docs/search.png)
 
-### 💬 Community
+### Community
 ![Community page with posts and voting](docs/community.png)
 
-### 🧵 Threaded Discussion
+### Threaded Discussion
 ![A single post with threaded comments](docs/post-page.png)
 
-### 👤 Profile
+### Profile
 ![User profile with avatar, stats, and watchlist](docs/profile.png)
 
-### 🔖 Watchlist
+### Watchlist
 ![Personal watchlist with status filters](docs/watchlist.png)
 
-### 🔐 Auth
+### Auth
 ![Signup page with anime poster collage](docs/auth.png)
 
-### 📱 Mobile
+### Mobile
 <div align="center">
   <img src="docs/screenshots/mobile.png" alt="Mobile view" width="320" />
 </div>
@@ -105,7 +105,7 @@ AnimeWeebs is a modern anime streaming and discovery web application that allows
 
 ---
 
-## 👨Team Members
+## Team Members
 
 This project was created and developed by:
 
